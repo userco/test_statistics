@@ -1,17 +1,24 @@
-<!doctype html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+@extends('layouts.app')
 
-        <title>Програма за изследване и оценяване в образованието</title>
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+               <div class="card-body">
+                    @if (session('status'))
+                        <div class="alert alert-success" role="alert">
+                            {{ session('status') }}
+                        </div>
+                    @endif
 
-        <!-- Fonts -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUIyJ" crossorigin="anonymous">
-	</head>
-	<body>
-	<h1>Програма за изследване и оценяване в образованието</h1>
-
-       
-    </body>
-</html>
+					<div class="alert alert-success">
+						Уважаеми учители, <br/>
+						Това приложение е създадено за вас. С негова помощ може да оценявате учениците и да проследявате техните резултати. То прави анализ на тестовете и тестовите задачи и писмено тълкуване на анализа. Тестовите резултати и анализи се онагледяват с диаграми.
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

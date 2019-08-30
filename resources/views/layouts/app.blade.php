@@ -41,14 +41,29 @@
                         <!-- Authentication Links -->
                         @guest
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                                <a class="nav-link" href="{{ route('login') }}">{{ __('Вход') }}</a>
                             </li>
                             @if (Route::has('register'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
+                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Регистриране') }}</a>
                                 </li>
                             @endif
                         @else
+							<li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Начало') }}</a>
+                            </li>
+							<li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Изтегляне') }}</a>
+                            </li>
+							<li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Импорт') }}</a>
+                            </li>
+							<li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Резултати') }}</a>
+                            </li>
+							<li class="nav-item">
+                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Търсене') }}</a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>
@@ -58,7 +73,7 @@
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
+                                        {{ __('Изход') }}
                                     </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">

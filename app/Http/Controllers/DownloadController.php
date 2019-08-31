@@ -29,9 +29,33 @@ class DownloadController extends Controller
 		$spreadsheet = new Spreadsheet();
 		$sheet = $spreadsheet->getActiveSheet();
 		$sheet->setCellValue('A1', 'Ключ');
-		$sheet->setCellValue('B1', 'Брой дистрактори');
+		$sheet->setCellValue('A2', 'Брой дистрактори');
+		$sheet->setCellValue('A3', '№');
+		$sheet->setCellValue('B3', 'Име');
+		$columns = ['A', 'B', 'C', 'D', 'E','F','G','H','I','J','K','L','M','N','O','P','Q',
+		'R','S','T','U','V','W','X','Y','Z'];
+		$i = 2;
+		while(isset($columns[$i])){
+			$j = $i - 1;
+			$letter = $columns[$i];  
+			$sheet->setCellValue($letter."3", $j);	
+			$i++;	
+		}	
 		$writer = new Xlsx($spreadsheet);
-		$writer->save('downloads/hello world.xlsx');
+		$t = time();
+		$filename = "template".$t.".xlsx";
+		$writer->save('downloads/'.$filename);
+		// Redirect output to a client’s web browser (Xlsx)
+		/*header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename=$filename');
+		header('Cache-Control: max-age=0');
+		// If you're serving to IE 9, then the following may be needed
+		header('Cache-Control: max-age=1');
+		$writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+		$writer->save('php://output');
+		
+		exit;
+		*/
 		
 		return View::make('download/download');;
 	}

@@ -14,8 +14,8 @@
 		@endif
 		{{ Form::open(array('method'=>'post', 'url' => '/import')) }}
 		{{Form::label('file', 'Изберете файл')}} 
-		{{ Form::file('file', null)}}
-		{{Form::submit('Запазване', null, array('class' => 'btn btn-primary'))}}
+		{!! Form::file('file',array('class' => 'btn btn-warning'))!!}
+		{!!Form::submit('Запазване', array('class' => 'btn btn-danger'))!!}
 		
 		{{ Form::close() }}
 		

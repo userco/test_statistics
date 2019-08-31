@@ -53,10 +53,10 @@
                                     <a class="nav-link" href="{{ route('home') }}">{{ __('Начало') }}</a>
                             </li>
 							<li class="nav-item">
-                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Изтегляне') }}</a>
+                                    <a class="nav-link" href="{{ route('download') }}">{{ __('Изтегляне') }}</a>
                             </li>
 							<li class="nav-item">
-                                    <a class="nav-link" href="{{ route('home') }}">{{ __('Импорт') }}</a>
+                                    <a class="nav-link" href="{{ route('import') }}">{{ __('Импорт') }}</a>
                             </li>
 							<li class="nav-item">
                                     <a class="nav-link" href="{{ route('home') }}">{{ __('Резултати') }}</a>

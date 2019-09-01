@@ -28,6 +28,7 @@ class DownloadController extends Controller
     public function create(Request $request){
 		$spreadsheet = new Spreadsheet();
 		$sheet = $spreadsheet->getActiveSheet();
+		$sheet->mergeCells('A1:B1');
 		$sheet->setCellValue('A1', 'Ключ');
 		$sheet->setCellValue('A2', 'Брой дистрактори');
 		$sheet->setCellValue('A3', '№');
@@ -35,10 +36,22 @@ class DownloadController extends Controller
 		$columns = ['A', 'B', 'C', 'D', 'E','F','G','H','I','J','K','L','M','N','O','P','Q',
 		'R','S','T','U','V','W','X','Y','Z'];
 		$i = 2;
+		$spreadsheet->getActiveSheet()->getStyle('A1:Z1')
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+		$spreadsheet->getActiveSheet()->getStyle('A2:C2')
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);			
 		while(isset($columns[$i])){
 			$j = $i - 1;
 			$letter = $columns[$i];  
-			$sheet->setCellValue($letter."3", $j);	
+			$sheet->setCellValue($letter."3", $j);
+			$spreadsheet->getActiveSheet()->getStyle($letter."3")
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
 			$i++;	
 		}	
 		$writer = new Xlsx($spreadsheet);

@@ -18,7 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/import', 'ImportController@index')->name('import');
-Route::post('/import', 'ImportController@create')->name('import');
+Route::get('/import', 'ImportController@create')->name('import');
+Route::post('/import', 'ImportController@store')->name('import');
 Route::get('/download', 'DownloadController@index')->name('download');
 Route::post('/download', 'DownloadController@create')->name('download');

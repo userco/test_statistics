@@ -12,13 +12,13 @@
 				</ul>
 			  </div><br />
 		@endif
-		{{ Form::open(array('method'=>'post', 'url' => '/import')) }}
+		{{ Form::open(array('method'=>'post', 'url' => '/import','files'=>'true')) }}
 		<div class="row">
         <div class="col">
             <div class="input-group mb-3">
                 <label class="custom-file border">
-                    <input type="file" id="inputGroupFile02" class="custom-file-input" required>
-                    <span class="custom-file-control pr-3" style="white-space: 
+                    <input type="file" name="file" id="inputGroupFile02" class="custom-file-input"  onchange="$('#uploaded-file-name').text($('#inputGroupFile02')[0].value);" required>
+                    <span class="custom-file-control pr-3" id="uploaded-file-name" style="white-space: 
 nowrap;">Файл... </span>
                     <div class="input-group-append">
                         <span class="btn btn-primary" id="inputGroupFile02">Импорт</span>

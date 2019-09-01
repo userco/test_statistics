@@ -8,18 +8,18 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class ImportFIle implements ShouldQueue
+class ProcessFile implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-	protected $fileContents;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($array)
+    public function __construct()
     {
-        $this->fileContents = $array;
+        //
     }
 
     /**
@@ -29,8 +29,6 @@ class ImportFIle implements ShouldQueue
      */
     public function handle()
     {
-        foreach($this->fileContents as $row){
-			
-		}	
+        //
     }
 }

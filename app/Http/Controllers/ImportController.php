@@ -8,6 +8,7 @@ use View;
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Storage;
 
 class ImportController extends Controller
 {
@@ -21,39 +22,47 @@ class ImportController extends Controller
         $this->middleware('auth');
     }
 
-    public function index(){
+    public function create(){
 		return View::make('import/import');
 	}
 	
     public function store(Request $request){
 		
-		//validate user input
-        $validatedData = $request->validate([
-			  'email' => 'required|email',
-			  'name' => 'required',
-			  'city' => 'required'
-		 ]);
-
-		//get user input
-		$input = Input::get();
-		$email = $input['email'];
-		$name = $input['name'];
-		$city = $input['city'];	
-		
-		//save user data
-		$appObject = new App;
-		$appObject->email = $email;
-		$appObject->name = $name;
-		$appObject->city = $city;
-		$appObject->save();
-		
-		//send an email
-		Mail::to($email)->send(new AppEmail($appObject));
-		
-		return View::make('app/thankyou')->with(array('name'=> $name));
+		 $file = $request->file('file');
+   
+      /*/Display File Name
+      echo 'File Name: '.$file->getClientOriginalName();
+      echo '<br>';
+   
+      //Display File Extension
+      echo 'File Extension: '.$file->getClientOriginalExtension();
+      echo '<br>';
+   
+      //Display File Real Path
+      echo 'File Real Path: '.$file->getRealPath();
+      echo '<br>';
+   
+      //Display File Size
+      echo 'File Size: '.$file->getSize();
+      echo '<br>';
+   
+      //Display File Mime Type
+      echo 'File Mime Type: '.$file->getMimeType();
+   */
+		$t = time();
+		$originalName = $file->getClientOriginalName();
+		$array = explode(".",$originalName);
+		$name = $array[0];
+		$fileName = $name.$t.".".$file->getClientOriginalExtension();
+		  //Move Uploaded File
+		$destinationPath = 'uploads';
+		$file->move($destinationPath,$fileName);
+		$inputFileName = '/uploads/'.$fileName;
+		$spreadsheet = IOFactory::load($inputFileName);
+		$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+		ImportFIle::dispatch($sheetdata);
+		return View::make('import/import');
 	}
 	
-	public function show(Request $request, $name){		
-		return View::make('app/thankyou')->with(array('name'=> $name));
-	}	
+	
 }	

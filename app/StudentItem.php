@@ -11,4 +11,5 @@ class StudentItem extends Model
         'id', 'item_score', 'answer', 'item_id', 'student_id'
     ];
 	protected $primaryKey = 'id';
+	public $timestamps = false;
 }

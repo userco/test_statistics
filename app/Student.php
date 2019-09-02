@@ -11,4 +11,5 @@ class Student extends Model
         'id', 'test_id', 'class_number', 'test_score', 'name'
     ];
 	protected $primaryKey = 'id';
+	public $timestamps = false;
 }

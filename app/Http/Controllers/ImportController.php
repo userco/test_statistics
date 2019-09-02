@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Jobs\ImportFIle;
 
 class ImportController extends Controller
 {
@@ -57,10 +59,11 @@ class ImportController extends Controller
 		  //Move Uploaded File
 		$destinationPath = 'uploads';
 		$file->move($destinationPath,$fileName);
-		$inputFileName = '/uploads/'.$fileName;
+		$inputFileName = 'uploads/'.$fileName;
 		$spreadsheet = IOFactory::load($inputFileName);
 		$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-		ImportFIle::dispatch($sheetdata);
+		//var_dump($sheetData);
+		ImportFIle::dispatch($sheetData);
 		return View::make('import/import');
 	}
 	

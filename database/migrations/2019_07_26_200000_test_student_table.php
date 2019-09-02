@@ -15,10 +15,14 @@ class TestStudentTable extends Migration
     {
         Schema::create('test_student', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->float('mark');
-            $table->integer('test_score');
+            $table->double('mark')->nullable();
+            $table->integer('test_score')->nullable();
 			$table->integer('student_id');
 			$table->integer('test_id');
+			$table->integer('test_score_rem')->nullable();
+			$table->engine = 'InnoDB';
+			$table->charset = 'utf8';
+			$table->collation = 'utf8_unicode_ci';
         });
     }
 

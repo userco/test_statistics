@@ -15,10 +15,13 @@ class StudentItemTable extends Migration
     {
         Schema::create('student_item', function (Blueprint $table) {
             $table->bigIncrements('id');
-			$table->integer('item_score');
-            $table->string('answer')->collation('utf8_unicode_ci');
+			$table->integer('item_score')->nullable();
+            $table->string('answer')->collation('utf8_unicode_ci')->nullable();
             $table->integer('item_id');
             $table->integer('student_id');
+			$table->engine = 'InnoDB';
+			$table->charset = 'utf8';
+			$table->collation = 'utf8_unicode_ci';
         });
     }
 

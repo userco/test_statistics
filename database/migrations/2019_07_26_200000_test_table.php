@@ -15,17 +15,20 @@ class TestTable extends Migration
     {
         Schema::create('test', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('count_distractors');
-            $table->integer('students_count');
-			$table->integer('items_count');
-			$table->integer('mean');
-			$table->integer('sd');
-			$table->integer('disperse');
-			$table->integer('min_bal');
-			$table->integer('max_bal');
-			$table->integer('kr20');
-			$table->integer('sem');
-			$table->integer('median');
+            $table->integer('count_distractors')->nullable();
+            $table->integer('students_count')->nullable();
+			$table->integer('items_count')->nullable();
+			$table->double('mean')->nullable();
+			$table->double('sd')->nullable();
+			$table->double('disperse')->nullable();
+			$table->integer('min_bal')->nullable();
+			$table->integer('max_bal')->nullable();
+			$table->double('kr20')->nullable();
+			$table->double('sem')->nullable();
+			$table->double('median')->nullable();
+			$table->engine = 'InnoDB';
+			$table->charset = 'utf8';
+			$table->collation = 'utf8_unicode_ci';
         });
     }
 

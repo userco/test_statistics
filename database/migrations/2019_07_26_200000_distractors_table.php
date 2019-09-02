@@ -15,10 +15,13 @@ class DistractorsTable extends Migration
     {
         Schema::create('distractors', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('letter')->collation('utf8_unicode_ci');
+            $table->string('letter')->collation('utf8_unicode_ci')->nullable();
             $table->integer('item_id');
-			$table->integer('count_answers');
-			$table->float('discrimination');
+			$table->integer('count_answers')->nullable();
+			$table->double('discrimination')->nullable();
+			$table->engine = 'InnoDB';
+			$table->charset = 'utf8';
+			$table->collation = 'utf8_unicode_ci';
         });
     }
 

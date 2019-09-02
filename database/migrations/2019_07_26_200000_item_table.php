@@ -16,17 +16,19 @@ class ItemTable extends Migration
         Schema::create('item', function (Blueprint $table) {
             $table->bigIncrements('id');
 			$table->integer('test_id');
-            $table->string('right_answer')->collation('utf8_unicode_ci');
-			$table->float('difficulty');
-			$table->float('discrimination');
-			$table->integer('number');
-			$table->integer('number_correct');
-			$table->integer('number_incorrect');
-			$table->float('mean_correct');
-			$table->float('mean_incorrect');
-			$table->float('rpbis');
-			$table->float('kr20_rem');
-			$table->float('test_score_rem');
+            $table->string('right_answer')->collation('utf8_unicode_ci')->nullable();
+			$table->double('difficulty')->nullable();
+			$table->double('discrimination')->nullable();
+			$table->integer('number')->nullable();
+			$table->integer('number_correct')->nullable();
+			$table->integer('number_incorrect')->nullable();
+			$table->double('mean_correct')->nullable();
+			$table->double('mean_incorrect')->nullable();
+			$table->double('rpbis')->nullable();
+			$table->double('kr20_rem')->nullable();
+			$table->engine = 'InnoDB';
+			$table->charset = 'utf8';
+			$table->collation = 'utf8_unicode_ci';
         });
     }
 

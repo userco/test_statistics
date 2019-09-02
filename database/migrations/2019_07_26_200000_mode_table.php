@@ -16,7 +16,10 @@ class ModeTable extends Migration
         Schema::create('mode', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('test_id');
-            $table->float('mode');
+            $table->double('mode');
+			$table->engine = 'InnoDB';
+			$table->charset = 'utf8';
+			$table->collation = 'utf8_unicode_ci';
         });
     }
 

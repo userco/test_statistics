@@ -59,7 +59,7 @@
                                     <a class="nav-link" href="{{ route('import') }}">{{ __('Импорт') }}</a>
                             </li>
 							<li class="nav-item">
-                                    <a class="nav-link" href="{{ route('result') }}">{{ __('Резултати') }}</a>
+                                    <a class="nav-link" href="{{ route('result') }}">{{ __('Генериране') }}</a>
                             </li>
 							<li class="nav-item">
                                     <a class="nav-link" href="{{ route('home') }}">{{ __('Търсене') }}</a>

@@ -15,6 +15,7 @@ class TestTable extends Migration
     {
         Schema::create('test', function (Blueprint $table) {
             $table->bigIncrements('id');
+			$table->integer('user_id');
             $table->integer('count_distractors')->nullable();
             $table->integer('students_count')->nullable();
 			$table->integer('items_count')->nullable();
@@ -26,6 +27,7 @@ class TestTable extends Migration
 			$table->double('kr20')->nullable();
 			$table->double('sem')->nullable();
 			$table->double('median')->nullable();
+			$table->integer('result_processed')->nullable();
 			$table->engine = 'InnoDB';
 			$table->charset = 'utf8';
 			$table->collation = 'utf8_unicode_ci';

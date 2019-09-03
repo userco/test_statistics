@@ -35,8 +35,11 @@ class ImportFIle implements ShouldQueue
     public function handle()
     {
 		$i = 0;
+		$user = \Auth::user();
+		$userId = $user->id;
 		//insert new test
 		$test = new Test;
+		$test->user_id = $userId;
 		$test->save();
         foreach($this->fileContents as $row){
 			$j = 0;
@@ -63,7 +66,6 @@ class ImportFIle implements ShouldQueue
 				}
 				if($i>=3 && $j == 2 && $cell){
 					//insert student
-					var_dump($cell);
 					$student->name = $cell;
 					$student->save();
 				}

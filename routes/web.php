@@ -22,3 +22,5 @@ Route::get('/import', 'ImportController@create')->name('import');
 Route::post('/import', 'ImportController@store')->name('import');
 Route::get('/download', 'DownloadController@index')->name('download');
 Route::post('/download', 'DownloadController@create')->name('download');
+Route::get('/result', 'ResultController@create')->name('result');
+Route::post('/result', 'ResultController@store')->name('result');

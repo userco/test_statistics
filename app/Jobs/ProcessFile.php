@@ -9,6 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use DB;
 use App\Test;
+use App\Item;
+use App\StudentItem;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -42,6 +44,13 @@ class ProcessFile implements ShouldQueue
 						 ->first();
 		if($result){
 			$test_id = $result->id;
+			
+			
+			students_count($test_id);
+			items_count($test_id);
+			student_item_score($test_id);
+			calculate_test_score($test_id);
+			
 			$test = Test::find($test_id);
 			$spreadsheet = new Spreadsheet();
 			$sheet = $spreadsheet->getActiveSheet();
@@ -54,6 +63,7 @@ class ProcessFile implements ShouldQueue
 			$t = time();
 			$filename = "test_analysis".$t.".xlsx";
 			$writer->save('results/'.$filename);
+				
 				
 		}
 		

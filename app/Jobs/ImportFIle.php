@@ -73,7 +73,7 @@ class ImportFIle implements ShouldQueue
 					//insert student item
 					$studentItem = new StudentItem;
 					$studentItem->answer = $cell;
-					$studentItem->item_id = $item->id;
+					$studentItem->item_id = $j - 3;
 					$studentItem->student_id = $student->id;
 					$studentItem->save();
 				}

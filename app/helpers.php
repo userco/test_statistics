@@ -138,7 +138,7 @@ if (! function_exists('calculate_disperse')) {
 				->first();
 			
 			$test_score = $result->test_score;
-			$disperse += ($test_score - $average)*($test_score - $average)
+			$disperse += ($test_score - $average)*($test_score - $average);
 		}
 		$disperse /= $std_cnt;
 		DB::table('test')

@@ -131,7 +131,7 @@ if (! function_exists('calculate_disperse')) {
 				->first();
 		$std_cnt =  $result->count_students;
 		$result2 = DB::table('test')
-				->select('mean'))
+				->select('mean')
 				->where('id', $test_id)
 				->first();
 		$average = $result2->mean;

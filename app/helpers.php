@@ -125,8 +125,16 @@ if (! function_exists('calculate_test_score')) {
 if (! function_exists('calculate_disperse')) {
     function calculate_disperse($test_id)
     {
-		$std_cnt = students_count($test_id);
-		$average = calculate_avg_score($test_id);
+		$result = DB::table('student')
+				->select( DB::raw('COUNT(*) as count_students'))
+				->where('test_id', $test_id)
+				->first();
+		$std_cnt =  $result->count_students;
+		$result2 = DB::table('test')
+				->select('mean'))
+				->where('id', $test_id)
+				->first();
+		$average = $result2->mean;
 		$disperse = 0;
 		$students = Student::where('test_id', $test_id)->get();
 		foreach($students as $student){
@@ -227,6 +235,39 @@ if (! function_exists('calculate_rpbis')) {
                 ->first();
 			$sd = $result2->sd;
 			$mean = $result2->mean;
+			$q = 0;
+			if($p < 1)  $q = 1 - $p;
+			
+			$tmp1 = $p/$q;
+			$tmp2 = sqrt($tmp1);
+			$tmp3 = $mean_correct - $mean;
+			$tmp4 = $tmp3/$sd;
+			
+			$rpbis = $tmp2*$tmp4;
+			
+			DB::table('item')
+            ->where('id', $item_id)
+            ->update(['rpbis' => $rpbis]);
+		}
+        return true;
+    }
+}
+if (! function_exists('calculate_kr20')) {
+    function calculate_kr20($test_id)
+    {
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item->id;
+			$result = DB::table('item')
+                ->select('difficulty')
+				->where('id', $item_id)
+                ->first();
+			$p = $result->difficulty;
+			$result2 = DB::table('test')
+                ->select('disperse')
+				->where('id', $test_id)
+                ->first();
+			$sd = $result2->disperse;
 			$q = 0;
 			if($p < 1)  $q = 1 - $p;
 			

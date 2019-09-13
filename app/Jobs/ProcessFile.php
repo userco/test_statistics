@@ -55,6 +55,9 @@ class ProcessFile implements ShouldQueue
 			calculate_disperse($test_id);
 			calculate_std_deviation($test_id);
 			calculate_mode($test_id);
+			calculate_difficulty($test_id);
+			calculate_rpbis($test_id);
+			calculate_kr20($test_id);
 			
 			
 			$test = Test::find($test_id);

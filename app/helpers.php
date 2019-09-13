@@ -256,6 +256,13 @@ if (! function_exists('calculate_kr20')) {
     function calculate_kr20($test_id)
     {
 		$items = Item::where('test_id', $test_id)->get();
+		$sum = 0;
+		$result2 = DB::table('test')
+                ->select('disperse')
+				->where('id', $test_id)
+                ->first();
+			
+		$disperse = $result2->disperse;
 		foreach($items as $item){
 			$item_id = $item->id;
 			$result = DB::table('item')
@@ -263,25 +270,29 @@ if (! function_exists('calculate_kr20')) {
 				->where('id', $item_id)
                 ->first();
 			$p = $result->difficulty;
-			$result2 = DB::table('test')
-                ->select('disperse')
-				->where('id', $test_id)
-                ->first();
-			$sd = $result2->disperse;
-			$q = 0;
-			if($p < 1)  $q = 1 - $p;
+	        $q = 1 - $p;
 			
-			$tmp1 = $p/$q;
-			$tmp2 = sqrt($tmp1);
-			$tmp3 = $mean_correct - $mean;
-			$tmp4 = $tmp3/$sd;
-			
-			$rpbis = $tmp2*$tmp4;
-			
-			DB::table('item')
-            ->where('id', $item_id)
-            ->update(['rpbis' => $rpbis]);
+			$sum += $p*$q;
 		}
+		$tmp2 = $sum/$disperse;
+		$tmp3 = 1 - $tmp2;
+		
+		$result = DB::table('item')
+			->select( DB::raw('COUNT(*) as items_count'))
+			->where('test_id', $test_id)
+			->first();
+			
+		$items_count = $result->items_count;
+			
+		$tmp4 = $items_count - 1;
+		$tmp5 = $items_count/$tmp4;
+		
+		$kr20 = $tmp5*$tmp3;
+		
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['kr20' => $kr20]);
+			
         return true;
     }
 }

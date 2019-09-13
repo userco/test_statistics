@@ -45,11 +45,17 @@ class ProcessFile implements ShouldQueue
 		if($result){
 			$test_id = $result->id;
 			
-			
 			students_count($test_id);
 			items_count($test_id);
 			student_item_score($test_id);
 			calculate_test_score($test_id);
+			calculate_avg_score($test_id);
+			calculate_min_score($test_id);
+			calculate_max_score($test_id);
+			calculate_disperse($test_id);
+			calculate_std_deviation($test_id);
+			calculate_mode($test_id);
+			
 			
 			$test = Test::find($test_id);
 			$spreadsheet = new Spreadsheet();

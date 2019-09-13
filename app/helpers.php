@@ -181,3 +181,66 @@ if (! function_exists('calculate_mode')) {
         return true;
     }
 }
+
+if (! function_exists('calculate_difficulty')) {
+    function calculate_difficulty($test_id)
+    {
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item->id;
+			$result = DB::table('student_item')
+                ->select( DB::raw('SUM(item_score) as count_right_answers'))
+				->where('item_id', $item_id)
+                ->first();
+			$count_right_answers = $result->count_right_answers;
+		    
+			$result2 = DB::table('student_item')
+                ->select( DB::raw('COUNT(item_score) as count_answers'))
+				->where('item_id', $item_id)
+                ->first();
+			$count_answers = $result2->count_answers;
+			
+			$difficulty = $count_right_answers/$count_answers;
+			
+			DB::table('item')
+            ->where('id', $item_id)
+            ->update(['difficulty' => $difficulty]);
+		}
+        return true;
+    }
+}
+if (! function_exists('calculate_rpbis')) {
+    function calculate_rpbis($test_id)
+    {
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item->id;
+			$result = DB::table('item')
+                ->select('difficulty, mean_correct')
+				->where('id', $item_id)
+                ->first();
+			$p = $result->difficulty;
+		    $mean_correct = $result->mean_correct;
+			$result2 = DB::table('test')
+                ->select('sd', 'mean')
+				->where('id', $test_id)
+                ->first();
+			$sd = $result2->sd;
+			$mean = $result2->mean;
+			$q = 0;
+			if($p < 1)  $q = 1 - $p;
+			
+			$tmp1 = $p/$q;
+			$tmp2 = sqrt($tmp1);
+			$tmp3 = $mean_correct - $mean;
+			$tmp4 = $tmp3/$sd;
+			
+			$rpbis = $tmp2*$tmp4;
+			
+			DB::table('item')
+            ->where('id', $item_id)
+            ->update(['rpbis' => $rpbis]);
+		}
+        return true;
+    }
+}

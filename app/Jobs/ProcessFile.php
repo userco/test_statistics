@@ -75,6 +75,7 @@ class ProcessFile implements ShouldQueue
 		
 			$spreadsheet = new Spreadsheet();
 			$sheet = $spreadsheet->getActiveSheet();
+			$sheet->setTitle("Резултати от теста");
 			$sheet->setCellValue('A1', 'Номер');
 			$sheet->setCellValue('B1', 'Име');
 			$sheet->setCellValue('C1', 'Брой точки');
@@ -95,6 +96,54 @@ class ProcessFile implements ShouldQueue
 				$i++;
 			}	
 			
+			$sheet2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за теста');
+			$spreadsheet->addSheet($sheet2, 1);
+			
+			$sheet2->setCellValue('A1', "Брой ученици");
+			$sheet2->setCellValue('B1', $test->students_count);
+			
+			$sheet2->setCellValue('A2', "Брой задачи");
+			$sheet2->setCellValue('B2', $test->items_count);
+			
+			$sheet2->setCellValue('A3', "Среден бал");
+			$sheet2->setCellValue('B3', $test->mean);
+			
+			$sheet2->setCellValue('A4', "Медиана");
+			$sheet2->setCellValue('B4', $test->median);
+			
+			$sheet2->setCellValue('A5', "Минимален бал");
+			$sheet2->setCellValue('B5', $test->min_bal);
+			
+			$sheet2->setCellValue('A6', "Mаксимален бал");
+			$sheet2->setCellValue('B6', $test->max_bal);
+			
+			$sheet2->setCellValue('A7', "Дисперсия");
+			$sheet2->setCellValue('B7', $test->disperse);
+			
+			$sheet2->setCellValue('A8', "Стандартно отклонение");
+			$sheet2->setCellValue('B8', $test->sd);
+			
+			$sheet2->setCellValue('A9', "Мин. трудност на задача");
+			$sheet2->setCellValue('B9', $test->min_difficulty);
+			
+			$sheet2->setCellValue('A10', "Макс. трудност на задача");
+			$sheet2->setCellValue('B10', $test->max_difficulty);
+			
+			$sheet2->setCellValue('A11', "Мин. дискриминация на задача");
+			$sheet2->setCellValue('B11', $test->min_discrimination);
+			
+			$sheet2->setCellValue('A12', "Макс. дискриминация на задача");
+			$sheet2->setCellValue('B12', $test->max_discrimination);
+			
+			$sheet2->setCellValue('A13', "Мин. ТБК");
+			$sheet2->setCellValue('B13', $test->min_rpbis);
+			
+			$sheet2->setCellValue('A14', "Макс. ТБК");
+			$sheet2->setCellValue('B14', $test->max_rpbis);
+			
+			$sheet2->setCellValue('A15', "Надеждност");
+			$sheet2->setCellValue('B15', $test->kr20);
+					
 			$writer = new Xlsx($spreadsheet);
 			$t = time();
 			$filename = "test_analysis".$t.".xlsx";

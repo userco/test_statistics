@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class DistractorsTable extends Migration
+class DistractorTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class DistractorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('distractors', function (Blueprint $table) {
+        Schema::create('distractor', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('letter')->collation('utf8_unicode_ci')->nullable();
             $table->integer('item_id');
@@ -32,6 +32,6 @@ class DistractorsTable extends Migration
      */
     public function down()
     {
-         Schema::drop('distractors');
+         Schema::drop('distractor');
     }
 }

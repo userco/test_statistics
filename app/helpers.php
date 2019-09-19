@@ -3,6 +3,7 @@ use App\Test;
 use App\Item;
 use App\StudentItem;
 use App\Student;
+use App\TestStudent;
 
 if (! function_exists('student_item_score')) {
     function student_item_score($test_id)
@@ -226,6 +227,102 @@ if (! function_exists('calculate_difficulty')) {
         return true;
     }
 }
+if (! function_exists('calculate_min_difficulty')) {
+    function calculate_min_difficulty($test_id)
+    {
+		$result = DB::table('item')
+                ->select( DB::raw('MIN(difficulty) as min_difficulty'))
+				->where('test_id', $test_id)
+                ->first();
+		$min_difficulty = $result->min_difficulty;
+		
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['min_difficulty' => $min_difficulty]);
+			
+        return true;
+    }
+}
+if (! function_exists('calculate_max_difficulty')) {
+    function calculate_max_difficulty($test_id)
+    {
+		$result = DB::table('item')
+                ->select( DB::raw('MAX(difficulty) as max_difficulty'))
+				->where('test_id', $test_id)
+                ->first();
+		$max_difficulty = $result->max_difficulty;
+			
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['max_difficulty' => $max_difficulty]);
+			
+        return true;
+    }
+}
+if (! function_exists('calculate_min_discrimination')) {
+    function calculate_min_discrimination($test_id)
+    {
+		$result = DB::table('item')
+                ->select( DB::raw('MIN(discrimination) as min_discrimination'))
+				->where('test_id', $test_id)
+                ->first();
+		$min_discrimination = $result->min_discrimination;
+			
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['min_discrimination' => $min_discrimination]);
+			
+        return true;
+    }
+}
+if (! function_exists('calculate_max_discrimination')) {
+    function calculate_max_discrimination($test_id)
+    {
+		$result = DB::table('item')
+                ->select( DB::raw('MAX(discrimination) as max_discrimination'))
+				->where('test_id', $test_id)
+                ->first();
+		$max_discrimination = $result->max_discrimination;
+			
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['max_discrimination' => $max_discrimination]);
+			
+        return true;
+    }
+}
+if (! function_exists('calculate_min_rpbis')) {
+    function calculate_min_rpbis($test_id)
+    {
+		$result = DB::table('item')
+                ->select( DB::raw('MIN(rpbis) as min_rpbis'))
+				->where('test_id', $test_id)
+                ->first();
+		$min_rpbis = $result->min_rpbis;
+			
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['min_rpbis' => $min_rpbis]);
+			
+        return true;
+    }
+}
+if (! function_exists('calculate_max_rpbis')) {
+    function calculate_max_rpbis($test_id)
+    {
+		$result = DB::table('item')
+                ->select( DB::raw('MAX(rpbis) as max_rpbis'))
+				->where('test_id', $test_id)
+                ->first();
+		$max_rpbis = $result->max_rpbis;
+			
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['max_rpbis' => $max_rpbis]);
+			
+        return true;
+    }
+}
 if (! function_exists('calculate_rpbis')) {
     function calculate_rpbis($test_id)
     {
@@ -233,7 +330,7 @@ if (! function_exists('calculate_rpbis')) {
 		foreach($items as $item){
 			$item_id = $item->id;
 			$result = DB::table('item')
-                ->select('difficulty, mean_correct')
+                ->select(DB::raw('difficulty, mean_correct'))
 				->where('id', $item_id)
                 ->first();
 			$p = $result->difficulty;
@@ -340,6 +437,53 @@ if (! function_exists('set_marks')) {
             ->where('student_id', $student_id)
             ->update(['mark' => $mark]);
 		}	
+        return true;
+    }
+}
+if (! function_exists('calculate_mean_correct_incorrect')) {
+    function calculate_mean_correct_incorrect($test_id)
+    {
+		$items = DB::table('item')
+                ->select('id')
+				->where('test_id', $test_id)
+                ->get();
+		
+		
+		foreach($items as $item){
+			$sumWrong = 0;
+			$cntWrong = 0;
+			$sumRight = 0;
+			$cntRight = 0;
+			
+			$id = $item->id;
+			$studentItems = StudentItem::where('item_id', $id)->get();
+			foreach($studentItems as $studentItem){
+				$student_id = $studentItem->student_id;
+				$testStudent = TestStudent::where('student_id', $student_id)->first();
+				$test_score = $testStudent->test_score;
+				if($studentItem->item_score == 1){
+					$sumRight += $test_score;
+					$cntRight++;
+				}
+				if($studentItem->item_score == 0){
+					$sumWrong += $test_score;
+					$cntWrong++;
+				}	
+			}
+			
+			$mean_correct = $sumRight / $cntRight;
+			$mean_incorrect = $sumWrong / $cntWrong;
+			
+			DB::table('item')
+				->where('id', $id)
+				->update([
+						'mean_correct' => $mean_correct, 
+						'mean_incorrect' => $mean_incorrect,
+						'number_correct' => $cntRight,
+						'number_incorrect' => $cntWrong
+				]);
+		}
+			
         return true;
     }
 }

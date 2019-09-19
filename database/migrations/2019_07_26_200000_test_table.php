@@ -24,6 +24,12 @@ class TestTable extends Migration
 			$table->double('disperse')->nullable();
 			$table->integer('min_bal')->nullable();
 			$table->integer('max_bal')->nullable();
+			$table->double('min_difficulty')->nullable();
+			$table->double('max_difficulty')->nullable();
+			$table->double('min_discrimination')->nullable();
+			$table->double('max_discrimination')->nullable();
+			$table->double('min_rpbis')->nullable();
+			$table->double('max_rpbis')->nullable();
 			$table->double('kr20')->nullable();
 			$table->double('sem')->nullable();
 			$table->double('median')->nullable();

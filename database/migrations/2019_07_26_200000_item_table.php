@@ -25,6 +25,8 @@ class ItemTable extends Migration
 			$table->double('mean_correct')->nullable();
 			$table->double('mean_incorrect')->nullable();
 			$table->double('rpbis')->nullable();
+			$table->double('disperse_rem')->nullable();
+			$table->double('mean_rem')->nullable();
 			$table->double('kr20_rem')->nullable();
 			$table->engine = 'InnoDB';
 			$table->charset = 'utf8';

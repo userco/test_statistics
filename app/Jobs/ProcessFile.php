@@ -59,8 +59,15 @@ class ProcessFile implements ShouldQueue
 			calculate_std_deviation($test_id);
 			calculate_mode($test_id);
 			calculate_difficulty($test_id);
-			//calculate_rpbis($test_id);
+			calculate_mean_correct_incorrect($test_id);
+			calculate_rpbis($test_id);
 			calculate_kr20($test_id);
+			calculate_min_difficulty($test_id);
+			calculate_max_difficulty($test_id);
+			calculate_min_discrimination($test_id);
+			calculate_max_discrimination($test_id);
+			calculate_min_rpbis($test_id);
+			calculate_max_rpbis($test_id);
 			
 			
 			$test = Test::find($test_id);

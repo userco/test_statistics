@@ -15,8 +15,6 @@ if (! function_exists('student_item_score')) {
 			$student_items = StudentItem::where('item_id', $item_id)->get();
 	
 			foreach($student_items as $student_item){
-				//var_dump("heer");
-			    //die();
 				$item_score = 0;
 				$answer = $student_item->answer;
 				$student_id = $student_item->student_id;
@@ -304,6 +302,44 @@ if (! function_exists('calculate_kr20')) {
             ->where('id', $test_id)
             ->update(['kr20' => $kr20]);
 			
+        return true;
+    }
+}
+if (! function_exists('set_marks')) {
+    function set_marks($test_id)
+    {
+		$students = Student::where('test_id', $test_id)->get();
+		$result = DB::table('test')
+                ->select( DB::raw('count_distractors, sd, items_count'))
+				->where('id', $test_id)
+                ->first();
+			
+		$sd = $result->sd;
+		$count_distractors = $result->count_distractors;
+		$count_items = $result->items_count;
+		
+		$N = 0.9 * $count_items;
+		$M = $count_items/$count_distractors;
+		$M += $sd;
+		
+		$a = 3/($N - $M);
+		$b = (3*$N - 6*$M)/($N - $M);
+		
+		foreach($students as $student){
+			$student_id = $student->id;
+			$result2 = DB::table('test_student')
+                ->select('test_score')
+				->where('student_id', $student_id)
+                ->first();
+			$test_score = $result2->test_score;
+	        $mark = $a * $test_score + $b;
+			if($mark < 2) $mark = 2;
+			if($mark > 6) $mark = 6;
+			
+			DB::table('test_student')
+            ->where('student_id', $student_id)
+            ->update(['mark' => $mark]);
+		}	
         return true;
     }
 }

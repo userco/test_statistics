@@ -51,6 +51,7 @@ class ProcessFile implements ShouldQueue
 			items_count($test_id);
 			student_item_score($test_id);
 			calculate_test_score($test_id);
+			set_marks($test_id);
 			calculate_avg_score($test_id);
 			calculate_min_score($test_id);
 			calculate_max_score($test_id);

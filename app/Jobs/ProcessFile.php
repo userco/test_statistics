@@ -11,6 +11,8 @@ use DB;
 use App\Test;
 use App\Item;
 use App\StudentItem;
+use App\Student;
+use App\TestStudent;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -56,17 +58,34 @@ class ProcessFile implements ShouldQueue
 			calculate_std_deviation($test_id);
 			calculate_mode($test_id);
 			calculate_difficulty($test_id);
-			calculate_rpbis($test_id);
+			//calculate_rpbis($test_id);
 			calculate_kr20($test_id);
 			
 			
 			$test = Test::find($test_id);
+			$students = Student::where('test_id', $test_id)->get();
+		
 			$spreadsheet = new Spreadsheet();
 			$sheet = $spreadsheet->getActiveSheet();
 			$sheet->setCellValue('A1', 'Номер');
 			$sheet->setCellValue('B1', 'Име');
 			$sheet->setCellValue('C1', 'Брой точки');
 			$sheet->setCellValue('D1', 'Оценка');
+			$i = 2;
+			foreach($students as $student){
+				$student_id = $student->id;
+				$testStudent = TestStudent::where('student_id', $student_id)->first();
+				$student_name = $student->name;
+				$student_number = $student->class_number;
+				$test_score = $testStudent->test_score;
+				$mark = $testStudent->mark;
+				
+				$sheet->setCellValue('A'.$i, $student_number);
+				$sheet->setCellValue('B'.$i, $student_name);
+				$sheet->setCellValue('C'.$i, $test_score);
+				$sheet->setCellValue('D'.$i, $mark);
+				$i++;
+			}	
 			
 			$writer = new Xlsx($spreadsheet);
 			$t = time();

@@ -13,13 +13,21 @@ if (! function_exists('student_item_score')) {
 			$right_answer = $item->right_answer;
 			$item_id = $item->id;
 			$student_items = StudentItem::where('item_id', $item_id)->get();
+	
 			foreach($student_items as $student_item){
+				//var_dump("heer");
+			    //die();
+				$item_score = 0;
 				$answer = $student_item->answer;
+				$student_id = $student_item->student_id;
 				if($answer == $right_answer)
-					$student_item->item_score = 1;
-				else 
-					$student_item->item_score = 0;
-				$student_item->save();
+					$item_score = 1;
+				
+				DB::table('student_item')
+					->where('item_id', $item_id)
+					->where('student_id', $student_id)
+					->update(['item_score' => $item_score]);
+				
 			}
 		}	
         return true;
@@ -185,7 +193,7 @@ if (! function_exists('calculate_mode')) {
 				
 		$test_score = $result->test_score;
 		DB::table('mode')
-            ->insert(['mode' => $test_score]);
+            ->insert(['mode' => $test_score, 'test_id' => $test_id]);
         return true;
     }
 }
@@ -208,7 +216,10 @@ if (! function_exists('calculate_difficulty')) {
                 ->first();
 			$count_answers = $result2->count_answers;
 			
-			$difficulty = $count_right_answers/$count_answers;
+			if($count_answers == 0)
+				$difficulty = 0;
+			else
+				$difficulty = $count_right_answers/$count_answers;
 			
 			DB::table('item')
             ->where('id', $item_id)

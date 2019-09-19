@@ -69,11 +69,17 @@ class ImportFIle implements ShouldQueue
 					$student->name = $cell;
 					$student->save();
 				}
-				if($i>=3 && $j > 3 && $cell){
+				if($i>=3 && $j > 2 && $cell){
 					//insert student item
 					$studentItem = new StudentItem;
 					$studentItem->answer = $cell;
-					$studentItem->item_id = $j - 3;
+					$k = $j - 2;
+					$item = DB::table('item')
+						->select('id')
+						->where('test_id', $test->id)
+						->where('number', $k)
+						->first();
+					$studentItem->item_id = $item->id;
 					$studentItem->student_id = $student->id;
 					$studentItem->save();
 				}

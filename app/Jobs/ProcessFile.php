@@ -144,6 +144,32 @@ class ProcessFile implements ShouldQueue
 			$sheet2->setCellValue('A15', "Надеждност");
 			$sheet2->setCellValue('B15', $test->kr20);
 					
+			$sheet3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за задачите');
+			$spreadsheet->addSheet($sheet3, 2);		
+			
+			$items = Item::where('test_id', $test_id)->get();			
+			
+			$sheet3->setCellValue('A2', "Задача");
+			$sheet3->setCellValue('B2', "Трудност");
+			$sheet3->setCellValue('C2', "Дискриминация");
+			$sheet3->setCellValue('D2', "ТБК");
+			$sheet3->setCellValue('E2', "Ср. бал на отг. правилно");
+			$sheet3->setCellValue('F2', "Ср. бал на отг. неправилно");
+			$sheet3->setCellValue('G2', "Коеф. надеждност-изтриване");
+			
+			$k = 3;
+			foreach($items as $item){
+				$sheet3->setCellValue('A'.$k, "Задача ". $item->number);
+				$sheet3->setCellValue('B'.$k, $item->difficulty);
+				$sheet3->setCellValue('C'.$k, $item->discrimination);
+				$sheet3->setCellValue('D'.$k, $item->rpbis);
+				$sheet3->setCellValue('E'.$k, $item->mean_correct);
+				$sheet3->setCellValue('F'.$k, $item->mean_incorrect);
+				$sheet3->setCellValue('G'.$k, $item->kr20_rem);
+				$k++;
+				
+			}	
+			
 			$writer = new Xlsx($spreadsheet);
 			$t = time();
 			$filename = "test_analysis".$t.".xlsx";

@@ -304,24 +304,24 @@ if (! function_exists('calculate_item_discrimination')) {
 		
 		
 		$bestStudents = DB::table('test_student')
-                ->select( 'id')
+                ->select( 'student_id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'desc')
 				->limit($limit)
                 ->get();
 		$best = [];		
 		foreach($bestStudents as $bestStudent){
-			$best[] = $bestStudent->id;
+			$best[] = $bestStudent->student_id;
 		}
 		$worstStudents = DB::table('test_student')
-                ->select( 'id')
+                ->select( 'student_id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'asc')
 				->limit($limit)
                 ->get();
 		$worst = [];		
 		foreach($worstStudents as $worstStudent){
-			$worst[] = $worstStudent->id;
+			$worst[] = $worstStudent->student_id;
 		}
 		
 		$items = Item::where('test_id', $test_id)->get();
@@ -362,36 +362,39 @@ if (! function_exists('calculate_distractor_discrimination')) {
 		
 		
 		$bestStudents = DB::table('test_student')
-                ->select( 'id')
+                ->select( 'student_id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'desc')
 				->limit($limit)
                 ->get();
 		$best = [];		
 		foreach($bestStudents as $bestStudent){
-			$best[] = $bestStudent->id;
+			$best[] = $bestStudent->student_id;
 		}
 		$worstStudents = DB::table('test_student')
-                ->select( 'id')
+                ->select( 'student_id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'asc')
 				->limit($limit)
                 ->get();
 		$worst = [];		
 		foreach($worstStudents as $worstStudent){
-			$worst[] = $worstStudent->id;
+			$worst[] = $worstStudent->student_id;
 		}
-		$cntBest = 0;
-		$cntWorst = 0;
+		//var_dump($best);
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
+			
 			$item_id = $item->id;
 			$distractors = Distractor::where('item_id', $item_id)->get();
 			$student_items = StudentItem::where('item_id', $item_id)->get();
 			foreach($distractors as $distractor){
+				$cntBest = 0;
+				$cntWorst = 0;
 				$distractor_id = $distractor->id;
 				foreach($student_items as $stud_item){
 					if($stud_item->answer == $distractor->letter){
+						//var_dump($stud_item->student_id);
 						if(in_array($stud_item->student_id, $best)){
 							$cntBest++;
 						}
@@ -400,13 +403,14 @@ if (! function_exists('calculate_distractor_discrimination')) {
 						}	
 					}	
 				}	
-			$discrimination = ($cntBest - $cntWorst)/$limit;
-			DB::table('distractor')
-            ->where('id', $distractor_id)
-            ->update(['discrimination' => $discrimination]);
-			}	
+				
+				$discrimination = ($cntBest - $cntWorst)/$limit;
+				DB::table('distractor')
+				->where('id', $distractor_id)
+				->update(['discrimination' => $discrimination]);
+			}
 		}	
-		
+		//die();
         return true;
     }
 }
@@ -422,9 +426,14 @@ if (! function_exists('calculate_answers_to_distractors')) {
 				$distractor_id = $distractor->id;
 				foreach($student_items as $stud_item){
 					if($stud_item->answer == $distractor->letter){
+						$cnt = DB::table('distractor')
+											->select( 'count_answers')
+											->where('id', $distractor_id)
+											->first();
+						$count_answers = $cnt->count_answers + 1;
 						DB::table('distractor')
 						->where('id', $distractor_id)
-						->update(['count_answers' => 'count_answers' + 1]);
+						->update(['count_answers' => $count_answers]);
 					}
 				}
 			}		

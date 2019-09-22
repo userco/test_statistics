@@ -12,6 +12,7 @@ use App\Test;
 use App\Item;
 use App\StudentItem;
 use App\Student;
+use App\Distractor;
 use App\TestStudent;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -159,9 +160,18 @@ class ProcessFile implements ShouldQueue
 			$sheet3->setCellValue('E2', "Ср. бал на отг. правилно");
 			$sheet3->setCellValue('F2', "Ср. бал на отг. неправилно");
 			$sheet3->setCellValue('G2', "Коеф. надеждност-изтриване");
-			
+			$sheet3->setCellValue('H1', "Разпределение на отговорите по дистрактори");
 			$k = 3;
+			$distractor_letters = [ 'A', 'B', 'C', 'D', 'E'];
+			$column_letters = [ 'H', 'I', 'J', 'K', 'L'];
+			for($i = 0; $i < $test->count_distractors; $i++){
+				$letter = $distractor_letters[$i];
+				$column = $column_letters[$i];
+				$sheet3->setCellValue($column."2", $letter);
+			}	
+		
 			foreach($items as $item){
+				$item_id = $item->id;
 				$sheet3->setCellValue('A'.$k, "Задача ". $item->number);
 				$sheet3->setCellValue('B'.$k, $item->difficulty);
 				$sheet3->setCellValue('C'.$k, $item->discrimination);
@@ -169,10 +179,167 @@ class ProcessFile implements ShouldQueue
 				$sheet3->setCellValue('E'.$k, $item->mean_correct);
 				$sheet3->setCellValue('F'.$k, $item->mean_incorrect);
 				$sheet3->setCellValue('G'.$k, $item->kr20_rem);
-				$k++;
 				
+				$distractors = Distractor::where('item_id', $item_id)->get();
+				foreach($distractors as $distractor){
+					
+					if($distractor->letter == 'A'){
+						if($distractor->letter == $item->right_answer)
+							$sheet3->getStyle('H'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet3->getStyle('H'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet3->setCellValue('H'.$k, $distractor->count_answers);
+					}
+					else if($distractor->letter == 'B'){
+						if($distractor->letter == $item->right_answer)
+							$sheet3->getStyle('I'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet3->getStyle('I'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet3->setCellValue('I'.$k, $distractor->count_answers);
+					}
+					else if($distractor->letter == 'C'){
+						if($distractor->letter == $item->right_answer)
+							$sheet3->getStyle('J'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet3->getStyle('J'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet3->setCellValue('J'.$k, $distractor->count_answers);
+					}
+					else if($distractor->letter == 'D'){
+						if($distractor->letter == $item->right_answer)
+							$sheet3->getStyle('K'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet3->getStyle('K'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet3->setCellValue('K'.$k, $distractor->count_answers);
+					}
+					else if($distractor->letter == 'E'){
+						if($distractor->letter == $item->right_answer)
+							$sheet3->getStyle('L'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet3->getStyle('L'.$k)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet3->setCellValue('L'.$k, $distractor->count_answers);
+					}
+				}	
+				$k++;
 			}	
 			
+			
+			$sheet4 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за дистракторите');
+			$spreadsheet->addSheet($sheet4, 3);		
+			$sheet4->setCellValue('A2', "Задача");
+			$sheet4->setCellValue('B1', "Дистрактор");
+			$column_letters2 = [ 'B', 'C', 'D', 'E', 'F'];
+			for($n = 0; $n < $test->count_distractors; $n++){
+				$letter = $distractor_letters[$n];
+				$column = $column_letters2[$n];
+				$sheet4->setCellValue($column."2", $letter);
+			}	
+			
+			$p = 3;
+			foreach($items as $item){
+				$item_id = $item->id;
+				$sheet4->setCellValue('A'.$p, "Задача ". $item->number);
+				$distractors = Distractor::where('item_id', $item_id)->get();
+				foreach($distractors as $distractor){
+					
+					if($distractor->letter == 'A'){
+						if($distractor->letter == $item->right_answer)
+							$sheet4->getStyle('B'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet4->getStyle('B'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet4->setCellValue('B'.$p, $distractor->discrimination);
+					}
+					else if($distractor->letter == 'B'){
+						if($distractor->letter == $item->right_answer)
+							$sheet4->getStyle('C'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet4->getStyle('C'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet4->setCellValue('C'.$p, $distractor->discrimination);
+					}
+					else if($distractor->letter == 'C'){
+						if($distractor->letter == $item->right_answer)
+							$sheet4->getStyle('D'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet4->getStyle('D'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet4->setCellValue('D'.$p, $distractor->discrimination);
+					}
+					else if($distractor->letter == 'D'){
+						if($distractor->letter == $item->right_answer)
+							$sheet4->getStyle('E'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet4->getStyle('E'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet4->setCellValue('E'.$p, $distractor->discrimination);
+					}
+					else if($distractor->letter == 'E'){
+						if($distractor->letter == $item->right_answer)
+							$sheet4->getStyle('F'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED
+					);
+						else
+							$sheet4->getStyle('F'.$p)
+					->getFont()->getColor()->setARGB(
+					\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE
+					);
+						$sheet4->setCellValue('F'.$p, $distractor->discrimination);
+					}
+				}	
+				$p++;
+			}	
+				
 			$writer = new Xlsx($spreadsheet);
 			$t = time();
 			$filename = "test_analysis".$t.".xlsx";

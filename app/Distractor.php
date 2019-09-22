@@ -11,4 +11,5 @@ class Distractor extends Model
         'id', 'letter', 'item_id', 'count_answers', 'discrimination'
     ];
 	protected $primaryKey = 'id';
+	public $timestamps = false;
 }

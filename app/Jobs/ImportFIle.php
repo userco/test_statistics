@@ -12,6 +12,7 @@ use App\Test;
 use App\Item;
 use App\Student;
 use App\StudentItem;
+use App\Distractor;
 
 class ImportFIle implements ShouldQueue
 {
@@ -43,8 +44,9 @@ class ImportFIle implements ShouldQueue
 		$test->save();
         foreach($this->fileContents as $row){
 			$j = 0;
+			$student_id = null;
 			foreach($row as $cell){
-				if($i==0 && $j> 2 && $cell){
+				if($i==0 && $j > 2 && $cell){
 					//insert item key
 					$item = new Item;
 					$item->test_id = $test->id;
@@ -52,46 +54,49 @@ class ImportFIle implements ShouldQueue
 					$item->right_answer = $cell;
 					$item->save();
 				}
-				if($i==1 && $j == 3 && $cell){
+				else if($i==1 && $j == 3 && $cell){
 					//insert count distractors
 					$test->count_distractors = $cell;
 					$test->save();
+					$test_id = $test->id;
 					$items = Item::where('test_id', $test_id)->get();
 					$letters = [ 'A', 'B', 'C', 'D', 'E'];
 					foreach($items as $single_item){
-						for($i = 0; $i < $test->count_distractors; $i++){
+						for($l = 0; $l < $test->count_distractors; $l++){
 							$distractor = new Distractor;
-							$distractor->letter = $letters[$i];
+							$distractor->letter = $letters[$l];
 							$distractor->item_id = $single_item->id;
 							$distractor->count_answers = 0;
 							$distractor->save();
 						}	
 					}	
 				}
-				if($i>=3 && $j == 0 && $cell){
+				else if($i>=3 && $j == 0 && $cell){
 					//insert student
 					$student = new Student;
 					$student->test_id = $test->id;
 					$student->class_number = $cell;
 					$student->save();
+					
 				}
-				if($i>=3 && $j == 2 && $cell){
+				else if($i>=3 && $j == 2 && $cell){
 					//insert student
 					$student->name = $cell;
 					$student->save();
+					$student_id = $student->id;
 				}
-				if($i>=3 && $j > 2 && $cell){
+				else if($i>=3 && $j > 2 && $cell){
 					//insert student item
 					$studentItem = new StudentItem;
-					$studentItem->answer = $cell;
 					$k = $j - 2;
 					$item = DB::table('item')
 						->select('id')
 						->where('test_id', $test->id)
 						->where('number', $k)
 						->first();
+				    $studentItem->answer = $cell;
 					$studentItem->item_id = $item->id;
-					$studentItem->student_id = $student->id;
+					$studentItem->student_id = $student_id;
 					$studentItem->save();
 				}
 				$j++;

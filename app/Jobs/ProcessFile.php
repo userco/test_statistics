@@ -59,6 +59,9 @@ class ProcessFile implements ShouldQueue
 			calculate_std_deviation($test_id);
 			calculate_mode($test_id);
 			calculate_difficulty($test_id);
+			calculate_item_discrimination($test_id);
+			calculate_distractor_discrimination($test_id);
+			calculate_answers_to_distractors($test_id);
 			calculate_mean_correct_incorrect($test_id);
 			calculate_rpbis($test_id);
 			calculate_kr20($test_id);

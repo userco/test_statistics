@@ -291,6 +291,145 @@ if (! function_exists('calculate_max_discrimination')) {
         return true;
     }
 }
+if (! function_exists('calculate_item_discrimination')) {
+    function calculate_item_discrimination($test_id)
+    {
+		$result = DB::table('test')
+                ->select( 'students_count')
+				->where('id', $test_id)
+                ->first();
+		$students_count = $result->students_count;
+		$limit = 0.27 * $students_count;
+		
+		
+		$bestStudents = DB::table('test_student')
+                ->select( 'id'))
+				->where('test_id', $test_id)
+				->orderBy('test_score', 'desc')
+				->limit($limit)
+                ->get();
+		$best = [];		
+		foreach($bestStudents as $bestStudent){
+			$best[] = $bestStudent->id;
+		}
+		$worstStudents = DB::table('test_student')
+                ->select( 'id'))
+				->where('test_id', $test_id)
+				->orderBy('test_score', 'asc')
+				->limit($limit)
+                ->get();
+		$worst = [];		
+		foreach($worstStudents as $worstStudent){
+			$worst[] = $worstStudent->id;
+		}
+		$cntBest = 0;
+		$cntWorst = 0;
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item_id;
+			$student_items = StudentItem::where('item_id', $item_id)->get();
+			foreach($student_items as $stud_item){
+				if($stud_item->item_score == 1){
+					if(in_array($stud_item->student_id, $best){
+						$cntBest++;
+					}
+					if(in_array($stud_item->student_id, $worst){
+						$cntWorst++;
+					}	
+				}	
+			}
+			$discrimination = ($cntBest - $cntWorst)/$limit;
+			DB::table('item')
+            ->where('id', $item_id)
+            ->update(['discrimination' => $discrimination]);
+			
+		}	
+		
+        return true;
+    }
+}
+if (! function_exists('calculate_distractor_discrimination')) {
+    function calculate_distractor_discrimination($test_id)
+    {
+		$result = DB::table('test')
+                ->select( 'students_count')
+				->where('id', $test_id)
+                ->first();
+		$students_count = $result->students_count;
+		$limit = 0.27 * $students_count;
+		
+		
+		$bestStudents = DB::table('test_student')
+                ->select( 'id'))
+				->where('test_id', $test_id)
+				->orderBy('test_score', 'desc')
+				->limit($limit)
+                ->get();
+		$best = [];		
+		foreach($bestStudents as $bestStudent){
+			$best[] = $bestStudent->id;
+		}
+		$worstStudents = DB::table('test_student')
+                ->select( 'id'))
+				->where('test_id', $test_id)
+				->orderBy('test_score', 'asc')
+				->limit($limit)
+                ->get();
+		$worst = [];		
+		foreach($worstStudents as $worstStudent){
+			$worst[] = $worstStudent->id;
+		}
+		$cntBest = 0;
+		$cntWorst = 0;
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item_id;
+			$distractors = Distractor::where('item_id', $item_id)->get();
+			$student_items = StudentItem::where('item_id', $item_id)->get();
+			foreach($distractors as $distractor){
+				$distractor_id = $distractor->id;
+				foreach($student_items as $stud_item){
+					if($stud_item->answer == $distractor->letter){
+						if(in_array($stud_item->student_id, $best){
+							$cntBest++;
+						}
+						if(in_array($stud_item->student_id, $worst){
+							$cntWorst++;
+						}	
+					}	
+				}	
+			$discrimination = ($cntBest - $cntWorst)/$limit;
+			DB::table('distractor')
+            ->where('id', $distractor_id)
+            ->update(['discrimination' => $discrimination]);
+			}	
+		}	
+		
+        return true;
+    }
+}
+if (! function_exists('calculate_answers_to_distractors')) {
+    function calculate_answers_to_distractors($test_id)
+    {
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item_id;
+			$distractors = Distractor::where('item_id', $item_id)->get();
+			$student_items = StudentItem::where('item_id', $item_id)->get();
+			foreach($distractors as $distractor){
+				$distractor_id = $distractor->id;
+				foreach($student_items as $stud_item){
+					if($stud_item->answer == $distractor->letter){
+						DB::table('distractor')
+						->where('id', $distractor_id)
+						->update(['count_answers' => 'count_answers' + 1]);
+					}
+				}
+			}		
+		}	
+        return true;
+    }
+}
 if (! function_exists('calculate_min_rpbis')) {
     function calculate_min_rpbis($test_id)
     {

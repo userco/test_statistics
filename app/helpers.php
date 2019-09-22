@@ -303,7 +303,7 @@ if (! function_exists('calculate_item_discrimination')) {
 		
 		
 		$bestStudents = DB::table('test_student')
-                ->select( 'id'))
+                ->select( 'id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'desc')
 				->limit($limit)
@@ -313,7 +313,7 @@ if (! function_exists('calculate_item_discrimination')) {
 			$best[] = $bestStudent->id;
 		}
 		$worstStudents = DB::table('test_student')
-                ->select( 'id'))
+                ->select( 'id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'asc')
 				->limit($limit)
@@ -330,10 +330,10 @@ if (! function_exists('calculate_item_discrimination')) {
 			$student_items = StudentItem::where('item_id', $item_id)->get();
 			foreach($student_items as $stud_item){
 				if($stud_item->item_score == 1){
-					if(in_array($stud_item->student_id, $best){
+					if(in_array($stud_item->student_id, $best)){
 						$cntBest++;
 					}
-					if(in_array($stud_item->student_id, $worst){
+					if(in_array($stud_item->student_id, $worst)){
 						$cntWorst++;
 					}	
 				}	
@@ -360,7 +360,7 @@ if (! function_exists('calculate_distractor_discrimination')) {
 		
 		
 		$bestStudents = DB::table('test_student')
-                ->select( 'id'))
+                ->select( 'id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'desc')
 				->limit($limit)
@@ -370,7 +370,7 @@ if (! function_exists('calculate_distractor_discrimination')) {
 			$best[] = $bestStudent->id;
 		}
 		$worstStudents = DB::table('test_student')
-                ->select( 'id'))
+                ->select( 'id')
 				->where('test_id', $test_id)
 				->orderBy('test_score', 'asc')
 				->limit($limit)
@@ -390,10 +390,10 @@ if (! function_exists('calculate_distractor_discrimination')) {
 				$distractor_id = $distractor->id;
 				foreach($student_items as $stud_item){
 					if($stud_item->answer == $distractor->letter){
-						if(in_array($stud_item->student_id, $best){
+						if(in_array($stud_item->student_id, $best)){
 							$cntBest++;
 						}
-						if(in_array($stud_item->student_id, $worst){
+						if(in_array($stud_item->student_id, $worst)){
 							$cntWorst++;
 						}	
 					}	

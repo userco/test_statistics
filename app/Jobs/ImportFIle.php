@@ -56,6 +56,17 @@ class ImportFIle implements ShouldQueue
 					//insert count distractors
 					$test->count_distractors = $cell;
 					$test->save();
+					$items = Item::all();
+					$letters = [ 'A', 'B', 'C', 'D', 'E'];
+					foreach($items as $single_item){
+						for($i = 0; $i < $test->count_distractors; $i++){
+							$distractor = new Distractor;
+							$distractor->letter = $letters[$i];
+							$distractor->item_id = $single_item->id;
+							$distractor->count_answers = 0;
+							$distractor->save();
+						}	
+					}	
 				}
 				if($i>=3 && $j == 0 && $cell){
 					//insert student

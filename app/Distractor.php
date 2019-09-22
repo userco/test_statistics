@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Distractors extends Model
+class Distractor extends Model
 {
-    protected $table = 'distractors';
+    protected $table = 'distractor';
 	protected $fillable = [
         'id', 'letter', 'item_id', 'count_answers', 'discrimination'
     ];

@@ -4,6 +4,7 @@ use App\Item;
 use App\StudentItem;
 use App\Student;
 use App\TestStudent;
+use App\Distractor;
 
 if (! function_exists('student_item_score')) {
     function student_item_score($test_id)
@@ -322,11 +323,12 @@ if (! function_exists('calculate_item_discrimination')) {
 		foreach($worstStudents as $worstStudent){
 			$worst[] = $worstStudent->id;
 		}
-		$cntBest = 0;
-		$cntWorst = 0;
+		
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
-			$item_id = $item_id;
+			$cntBest = 0;
+			$cntWorst = 0;
+			$item_id = $item->id;
 			$student_items = StudentItem::where('item_id', $item_id)->get();
 			foreach($student_items as $stud_item){
 				if($stud_item->item_score == 1){
@@ -383,7 +385,7 @@ if (! function_exists('calculate_distractor_discrimination')) {
 		$cntWorst = 0;
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
-			$item_id = $item_id;
+			$item_id = $item->id;
 			$distractors = Distractor::where('item_id', $item_id)->get();
 			$student_items = StudentItem::where('item_id', $item_id)->get();
 			foreach($distractors as $distractor){
@@ -413,7 +415,7 @@ if (! function_exists('calculate_answers_to_distractors')) {
     {
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
-			$item_id = $item_id;
+			$item_id = $item->id;
 			$distractors = Distractor::where('item_id', $item_id)->get();
 			$student_items = StudentItem::where('item_id', $item_id)->get();
 			foreach($distractors as $distractor){

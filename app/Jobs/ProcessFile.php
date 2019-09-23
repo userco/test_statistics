@@ -341,14 +341,100 @@ class ProcessFile implements ShouldQueue
 				}	
 				$p++;
 			}	
+			$sheet5 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Тълкуване на анализа на теста');
+			$spreadsheet->addSheet($sheet5, 4);	
+			
+			if($test->kr20 >= 0.7)
+				$sheet5->setCellValue('A1', 'Тестът е надежден.');
+			else
+				$sheet5->setCellValue('A1', 'Тестът не е надежден.');
+			$items2 = Item::where('test_id', $test_id)->get();
+			$it = 2;
+			foreach($items2 as $item2){
+				$sheet5->setCellValue('A'.$it, 'Задача '.$item2->number);
+				if($test->count_distractors == 2){
+					if($item2->difficulty >=0 && $item2->difficulty <= 0.5)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много трудна(недопустимо).');
+					else if($item2->difficulty >=0.51 && $item2->difficulty <= 0.6)
+						$sheet5->setCellValue('B'.$it, 'Задачата е трудна.');
+					else if($item2->difficulty >=0.61 && $item2->difficulty <= 0.8)
+						$sheet5->setCellValue('B'.$it, 'Задачата е оптимална.');
+					else if($item2->difficulty >=0.81 && $item2->difficulty <= 0.9)
+						$sheet5->setCellValue('B'.$it, 'Задачата е лесна.');
+					else if($item2->difficulty >=0.91 && $item2->difficulty <= 1)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много лесна.');
+				}
+				if($test->count_distractors == 3){
+					if($item2->difficulty >=0 && $item2->difficulty <= 0.33)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много трудна(недопустимо).');
+					else if($item2->difficulty >=0.34 && $item2->difficulty <= 0.46)
+						$sheet5->setCellValue('B'.$it, 'Задачата е трудна.');
+					else if($item2->difficulty >=0.47 && $item2->difficulty <= 0.73)
+						$sheet5->setCellValue('B'.$it, 'Задачата е оптимална.');
+					else if($item2->difficulty >=0.74 && $item2->difficulty <= 0.87)
+						$sheet5->setCellValue('B'.$it, 'Задачата е лесна.');
+					else if($item2->difficulty >=0.88 && $item2->difficulty <= 1)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много лесна.');
+				}
+				if($test->count_distractors == 4){
+					if($item2->difficulty >=0 && $item2->difficulty <= 0.25)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много трудна(недопустимо).');
+					else if($item2->difficulty >=0.26 && $item2->difficulty <= 0.4)
+						$sheet5->setCellValue('B'.$it, 'Задачата е трудна.');
+					else if($item2->difficulty >=0.41 && $item2->difficulty <= 0.7)
+						$sheet5->setCellValue('B'.$it, 'Задачата е оптимална.');
+					else if($item2->difficulty >=0.71 && $item2->difficulty <= 0.85)
+						$sheet5->setCellValue('B'.$it, 'Задачата е лесна.');
+					else if($item2->difficulty >=0.86 && $item2->difficulty <= 1)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много лесна.');
+				}
+				if($test->count_distractors == 5){
+					if($item2->difficulty >=0 && $item2->difficulty <= 0.20)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много трудна(недопустимо).');
+					else if($item2->difficulty >=0.21 && $item2->difficulty <= 0.36)
+						$sheet5->setCellValue('B'.$it, 'Задачата е трудна.');
+					else if($item2->difficulty >=0.37 && $item2->difficulty <= 0.68)
+						$sheet5->setCellValue('B'.$it, 'Задачата е оптимална.');
+					else if($item2->difficulty >=0.69 && $item2->difficulty <= 0.83)
+						$sheet5->setCellValue('B'.$it, 'Задачата е лесна.');
+					else if($item2->difficulty >=0.84 && $item2->difficulty <= 1)
+						$sheet5->setCellValue('B'.$it, 'Задачата е много лесна.');
+				}
+				if($item2->discrimination <= 0.1) 
+					$sheet5->setCellValue('E'.$it, 'Задачата не бива да се използва в този вид.');
+				if($item2->discrimination >= 0.11 && $item2->discrimination <= 0.20) 
+					$sheet5->setCellValue('E'.$it, 'Няма добра разделителна способност.');
+				if($item2->discrimination >= 0.21 && $item2->discrimination <= 0.30) 
+					$sheet5->setCellValue('E'.$it, 'Задачата да се преразгледа и подобри.');
+				if($item2->discrimination >= 0.31 && $item2->discrimination <= 0.40) 
+					$sheet5->setCellValue('E'.$it, 'Задачата може да се използва.');
+				if($item2->discrimination >= 0.41 && $item2->discrimination <= 1) 
+					$sheet5->setCellValue('E'.$it, 'Отлична разделителна способност.');
 				
+				$item2_id = $item2->id;
+				$limit = 0.05 * $test->students_count;
+				$distractors2 = Distractor::where('item_id', $item2_id)->get();
+				$sentences = "";
+				foreach($distractors2 as $distractor2){
+					if($distractor2->count_answers <= $limit){
+						$sentences .= 'Дистрактор '.$distractor2->letter.' e неработещ. ';
+					}
+				}
+				$sheet5->setCellValue('I'.$it, $sentences);	
+				$it++;				
+			}	
+			
+			$ldate = date('Y-m-d');
+			
 			$writer = new Xlsx($spreadsheet);
 			$t = time();
 			$filename = "test_analysis".$t.".xlsx";
 			$writer->save('results/'.$filename);
-				
-				
+			DB::table('result_file')
+				->insert(['test_id' => $test_id, 'user_id'=>$userId,'file_name' =>$filename,
+				'result_date'=>$ldate]);	
+			$test->result_processed = 1;
+			$test->save();	
 		}
-		
     }
 }

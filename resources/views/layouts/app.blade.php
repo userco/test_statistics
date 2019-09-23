@@ -48,7 +48,7 @@
 									<a class="nav-link" href="{{ route('result') }}">{{ __('Генериране') }}</a>
 							</li>
 							<li class="nav-item">
-									<a class="nav-link" href="{{ route('home') }}">{{ __('Търсене') }}</a>
+									<a class="nav-link" href="{{ route('search') }}">{{ __('Търсене') }}</a>
 							</li>
 					</ul>
 					@endif

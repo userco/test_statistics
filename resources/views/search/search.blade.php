@@ -15,12 +15,20 @@
 		@endif
 		{{ Form::open(array('method'=>'post', 'url' => '/search')) }}
 		<div class="form-group row">
-			<label for="start_date">Начална дата</label>
+			<div class="col-sm-3">
+				<label for="start_date">Начална дата</label>
+			</div>
+			<div class="col-sm-3">
 			{{ Form::date('start_date', date('d.M.Y')) }} 
+			</div>
 		</div>
 		<div class="form-group row">
-			<label for="end_date">Крайна дата</label>
-			{{ Form::date('end_date', date('d.M.Y')) }} 
+			<div class="col-sm-3">
+				<label for="end_date">Крайна дата</label>
+			</div>
+			<div class="col-sm-3">
+				{{ Form::date('end_date', date('d.M.Y')) }}
+			</div>			
 		</div>
 		<div class="row">
 			<div class="offset-sm-1 col-sm-3">

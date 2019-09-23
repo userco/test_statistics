@@ -72,7 +72,9 @@ class ProcessFile implements ShouldQueue
 			calculate_max_discrimination($test_id);
 			calculate_min_rpbis($test_id);
 			calculate_max_rpbis($test_id);
-			
+			calculate_mean_j_removed($test_id);
+			calculate_disperse_j_rem($test_id);
+			calculate_kr20_j_rem($test_id);
 			
 			$test = Test::find($test_id);
 			$students = Student::where('test_id', $test_id)->get();

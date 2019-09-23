@@ -80,6 +80,94 @@ if (! function_exists('calculate_avg_score')) {
         return true;
     }
 }
+if (! function_exists('calculate_mean_j_removed')) {
+    function calculate_mean_j_removed($test_id)
+    {	
+		$res =DB::table('test')
+				->select('items_count')
+				->where('id', $test_id)
+				->first();
+		$items_count = $res->items_count;		
+		$students = Student::where('test_id', $test_id)->get();
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$sum = 0;
+			$item_id = $item->id;
+			foreach($students as $student){
+				$student_id = $student->id;
+				$studentItems = StudentItem::where('student_id', $student_id)->get();
+				foreach($studentItems as $studentItem){
+					if($studentItem->item_id != $item_id){
+						$sum += $studentItem->item_score;
+					}
+				}		
+			}
+	
+			$mean_j_rem = $sum/($items_count -1);
+			DB::table('item')
+				->where('id', $item_id)
+				->update(['mean_rem' => $mean_j_rem]);
+		}		
+        return true;
+    }
+}
+if (! function_exists('calculate_disperse_j_rem')) {
+    function calculate_disperse_j_rem($test_id)
+    {	
+		$res = DB::table('test')
+				->select('items_count')
+				->where('id', $test_id)
+				->first();
+		$items_count = $res->items_count;	
+		$items = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item->id;
+			$testStudents = TestStudent::where('test_id', $test_id)->get();
+			$sum = 0;
+			$mean_j_rem = $item->mean_rem;
+			
+			foreach($testStudents as $testStudent){
+				$test_score = $testStudent->test_score;
+				$sum = ($test_score - $mean_j_rem)*($test_score - $mean_j_rem);
+			}	
+			$disperse_j_rem = $sum/($items_count -1);
+			DB::table('item')
+				->where('id', $item_id)
+				->update(['disperse_rem' => $disperse_j_rem]);
+		}
+        return true;
+    }
+}
+if (! function_exists('calculate_kr20_j_rem')) {
+    function calculate_kr20_j_rem($test_id)
+    {	
+		$res = DB::table('test')
+				->select('items_count')
+				->where('id', $test_id)
+				->first();
+		$items_count = $res->items_count;	
+		$items = Item::where('test_id', $test_id)->get();
+		$items2 = Item::where('test_id', $test_id)->get();
+		foreach($items as $item){
+			$item_id = $item->id;
+			$sum = 0;
+			foreach($items2 as $item2){
+				if($item_id != $item2->id){
+					$sum += $item2->difficulty * (1- $item2->difficulty);
+				}	
+			}
+			$temp = $sum/($item->disperse_rem);
+			$temp2 = 1 - $temp;
+			$temp3 = ($items_count -1)/($items_count - 2);
+			$kr20_j_rem = $temp3 * $temp2;
+			DB::table('item')
+				->where('id', $item_id)
+				->update(['kr20_rem' => $kr20_j_rem]);
+		}
+        return true;
+    }
+}
+
 if (! function_exists('calculate_min_score')) {
     function calculate_min_score($test_id)
     {
@@ -381,7 +469,6 @@ if (! function_exists('calculate_distractor_discrimination')) {
 		foreach($worstStudents as $worstStudent){
 			$worst[] = $worstStudent->student_id;
 		}
-		//var_dump($best);
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
 			
@@ -394,7 +481,6 @@ if (! function_exists('calculate_distractor_discrimination')) {
 				$distractor_id = $distractor->id;
 				foreach($student_items as $stud_item){
 					if($stud_item->answer == $distractor->letter){
-						//var_dump($stud_item->student_id);
 						if(in_array($stud_item->student_id, $best)){
 							$cntBest++;
 						}
@@ -410,7 +496,6 @@ if (! function_exists('calculate_distractor_discrimination')) {
 				->update(['discrimination' => $discrimination]);
 			}
 		}	
-		//die();
         return true;
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use View;
 use DB;
+use App\ResultFile;
 
 class SearchController extends Controller
 {
@@ -21,16 +22,17 @@ class SearchController extends Controller
 		 
 		$input = Input::get();
 		
+		$user = \Auth::user();
+		$userId = $user->id;
+		
 		$start_date = $input['start_date'];
 		$end_date = $input['end_date'];
-		$results =DB::table('result_file')
-				->select('file_name')
-				->where('result_date', '>=',$start_date)
-				->where('result_date', '<=',$end_date)
-				->get();
+		$results = ResultFile::where('user_id', $userId)->get();
 		$links = "";		
 		foreach($results as $result){
-			$links = "<a href='results/".$result->file_name."' target='_blank'>".$result->file_name."</a>";
+			if($result->result_date >= $start_date && $result->result_date <= $end_date){
+				$links .= "<a href='results/".$result->file_name."' target='_blank'>".$result->file_name."</a><br>";
+			}
 		}	
 		return View::make('search/search')->with(array('links'=> $links));
 	}	

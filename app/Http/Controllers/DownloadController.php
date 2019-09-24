@@ -25,7 +25,7 @@ class DownloadController extends Controller
 		return View::make('download/download');
 	}
 	
-    public function create(Request $request){
+   /* public function create(Request $request){
 		$spreadsheet = new Spreadsheet();
 		$sheet = $spreadsheet->getActiveSheet();
 		$sheet->mergeCells('A1:B1');
@@ -68,9 +68,9 @@ class DownloadController extends Controller
 		$writer->save('php://output');
 		
 		exit;
-		*/
+		
 		
 		return View::make('download/download');;
 	}
-	
+	*/
 }	

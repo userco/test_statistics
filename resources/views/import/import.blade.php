@@ -17,7 +17,8 @@
         <div class="col">
             <div class="input-group mb-3">
                 <label class="custom-file border">
-                    <input type="file" name="file" id="inputGroupFile02" class="custom-file-input"  onchange="$('#uploaded-file-name').text($('#inputGroupFile02')[0].value);" required>
+                    <input type="file" name="file" id="inputGroupFile02" class="custom-file-input"  onchange="$('#uploaded-file-name').text(this.files && this.files.length ?
+          this.files[0].name : this.value.replace(/^C:\\fakepath\\/i, ''));" required>
                     <span class="custom-file-control pr-3" id="uploaded-file-name" style="white-space: 
 nowrap;">Файл... </span>
                     <div class="input-group-append">
@@ -33,6 +34,5 @@ nowrap;">Файл... </span>
 			</div>	
 		</div>
 		{{ Form::close() }}
-		
 </div>
-@endsection
+@endsection 

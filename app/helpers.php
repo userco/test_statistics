@@ -637,6 +637,24 @@ if (! function_exists('calculate_kr20')) {
         return true;
     }
 }
+if (! function_exists('calculate_sem')) {
+    function calculate_sem($test_id)
+    {
+		$test = Test::where('id', $test_id)->first();
+			
+		$sd = $test->sd;
+		$kr20 = $test->kr20;
+		
+		$tmp = sqrt(1 - $kr20);
+		$sem = $sd * $tmp;
+		
+		DB::table('test')
+            ->where('id', $test_id)
+            ->update(['sem' => $sem]);
+			
+        return true;
+    }
+}
 if (! function_exists('set_marks')) {
     function set_marks($test_id)
     {

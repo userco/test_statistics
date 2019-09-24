@@ -66,6 +66,7 @@ class ProcessFile implements ShouldQueue
 			calculate_mean_correct_incorrect($test_id);
 			calculate_rpbis($test_id);
 			calculate_kr20($test_id);
+			calculate_sem($test_id);
 			calculate_min_difficulty($test_id);
 			calculate_max_difficulty($test_id);
 			calculate_min_discrimination($test_id);
@@ -149,6 +150,9 @@ class ProcessFile implements ShouldQueue
 			
 			$sheet2->setCellValue('A15', "Надеждност");
 			$sheet2->setCellValue('B15', $test->kr20);
+			
+			$sheet2->setCellValue('A16', "Грешка - измерване");
+			$sheet2->setCellValue('B16', $test->sem);
 					
 			$sheet3 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за задачите');
 			$spreadsheet->addSheet($sheet3, 2);		

@@ -87,7 +87,7 @@ class ProcessFile implements ShouldQueue
 			calculate_kr20_j_rem($test_id);
 			
 			$spreadsheet = new Spreadsheet();
-			$sheet0 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'shee');
+			$sheet0 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'graphs');
 			$spreadsheet->addSheet($sheet0, 0);
 			$sheet0 = $spreadsheet->getSheet(0);
 			$results = DB::table('test_student')
@@ -133,7 +133,7 @@ class ProcessFile implements ShouldQueue
 			//     Data values
 			//     Data Marker
 			$dataSeriesLabels1 = [
-				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'shee!$A$1', null, 1), 
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'graphs!$A$1', null, 1), 
 			];
 			// Set the X-Axis Labels
 			//     Datatype
@@ -143,7 +143,7 @@ class ProcessFile implements ShouldQueue
 			//     Data values
 			//     Data Marker
 			$xAxisTickValues1 = [
-				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'shee!$A$1:$A$5', null, 5), 
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'graphs!$A$1:$A$5', null, 5), 
 			];
 			// Set the Data values for each data series we want to plot
 			//     Datatype
@@ -153,7 +153,7 @@ class ProcessFile implements ShouldQueue
 			//     Data values
 			//     Data Marker
 			$dataSeriesValues1 = [
-				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'shee!$B$1:$B$5', null, 5),
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'graphs!$B$1:$B$5', null, 5),
 			];
 
 			// Build the dataseries
@@ -197,34 +197,9 @@ class ProcessFile implements ShouldQueue
 			// Add the chart to the worksheet
 			$sheet0->addChart($chart1);
 			//----------------------------------------------
+			
 			$test = Test::find($test_id);
 			$students = Student::where('test_id', $test_id)->get();
-		
-			
-			$sheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Графики');
-			$spreadsheet->addSheet($sheet, 5);
-			
-			$sheet->setTitle("Резултати от теста");
-			$sheet->setCellValue('A1', 'Номер');
-			$sheet->setCellValue('B1', 'Име');
-			$sheet->setCellValue('C1', 'Брой точки');
-			$sheet->setCellValue('D1', 'Оценка');
-			$i = 2;
-			foreach($students as $student){
-				$student_id = $student->id;
-				$testStudent = TestStudent::where('student_id', $student_id)->first();
-				$student_name = $student->name;
-				$student_number = $student->class_number;
-				$test_score = $testStudent->test_score;
-				$mark = $testStudent->mark;
-				
-				$sheet->setCellValue('A'.$i, $student_number);
-				$sheet->setCellValue('B'.$i, $student_name);
-				$sheet->setCellValue('C'.$i, $test_score);
-				$sheet->setCellValue('D'.$i, $mark);
-				$i++;
-			}	
-			
 			
 			$sheet2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за теста');
 			$spreadsheet->addSheet($sheet2, 1);
@@ -551,6 +526,30 @@ class ProcessFile implements ShouldQueue
 				$it++;				
 			}	
 			
+		
+			
+			$sheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Резултати от теста');
+			$spreadsheet->addSheet($sheet, 5);
+			
+			$sheet->setCellValue('A1', 'Номер');
+			$sheet->setCellValue('B1', 'Име');
+			$sheet->setCellValue('C1', 'Брой точки');
+			$sheet->setCellValue('D1', 'Оценка');
+			$i = 2;
+			foreach($students as $student){
+				$student_id = $student->id;
+				$testStudent = TestStudent::where('student_id', $student_id)->first();
+				$student_name = $student->name;
+				$student_number = $student->class_number;
+				$test_score = $testStudent->test_score;
+				$mark = $testStudent->mark;
+				
+				$sheet->setCellValue('A'.$i, $student_number);
+				$sheet->setCellValue('B'.$i, $student_name);
+				$sheet->setCellValue('C'.$i, $test_score);
+				$sheet->setCellValue('D'.$i, $mark);
+				$i++;
+			}	
 			$ldate = date('Y-m-d');
 			
 			$writer = new Xlsx($spreadsheet);

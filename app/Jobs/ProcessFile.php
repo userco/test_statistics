@@ -87,13 +87,41 @@ class ProcessFile implements ShouldQueue
 			calculate_kr20_j_rem($test_id);
 			
 			$spreadsheet = new Spreadsheet();
-			$sheet0 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'graphs');
-			$spreadsheet->addSheet($sheet0, 0);
-			$sheet0 = $spreadsheet->getSheet(0);
+			$sheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'results');
+			$spreadsheet->addSheet($sheet, 0);
+			$sheet = $spreadsheet->getSheet(0);
+			$sheet->setCellValue('A1', 'Номер');
+			$sheet->setCellValue('B1', 'Име');
+			$sheet->setCellValue('C1', 'Брой точки');
+			$sheet->setCellValue('D1', 'Оценка');
+			$i = 2;
+			$test = Test::find($test_id);
+			$students = Student::where('test_id', $test_id)->get();
+			foreach($students as $student){
+				$student_id = $student->id;
+				$testStudent = TestStudent::where('student_id', $student_id)->first();
+				$student_name = $student->name;
+				$student_number = $student->class_number;
+				$test_score = $testStudent->test_score;
+				$mark = $testStudent->mark;
+				
+				$sheet->setCellValue('A'.$i, $student_number);
+				$sheet->setCellValue('B'.$i, $student_name);
+				$sheet->setCellValue('C'.$i, $test_score);
+				$sheet->setCellValue('D'.$i, $mark);
+				$i++;
+			}	
 			$results = DB::table('test_student')
                 ->select('mark')
 				->where('test_id', $test_id)
                 ->get();
+			
+			$results2 = DB::table('test_student')
+                ->select( DB::raw('COUNT(test_score) as cnt, test_score'))
+				->where('test_id', $test_id)
+				->groupBy('test_score')
+				->orderBy('test_score', 'asc')
+				->get();
 				
 			$slab = 0; 
 			$sreden = 0; 
@@ -114,17 +142,80 @@ class ProcessFile implements ShouldQueue
 					$otlichen++; 
 			}
 			
-				$sheet0->fromArray(
-						[
-							['Слаб', $slab],
-							['Среден', $sreden],
-							['Добър', $dobyr],
-							['Мн. добър', $mn_dobyr],
-							['Отличен',  $otlichen],
-						]
-				);
-						//___________________________
-			
+			$sheet->setCellValue('F1',"Слаб");
+			$sheet->setCellValue('G1', $slab);
+			$sheet->setCellValue('F2',"Среден");
+			$sheet->setCellValue('G2', $sreden);
+			$sheet->setCellValue('F3',"Добър");
+			$sheet->setCellValue('G3', $dobyr);
+			$sheet->setCellValue('F4',"Мн. добър");
+			$sheet->setCellValue('G4', $mn_dobyr);
+			$sheet->setCellValue('F5',"Отличен");
+			$sheet->setCellValue('G5', $otlichen);
+				
+			$ind = 0;	
+			$scatter = [];
+			$num_count = 0;
+			foreach($results2 as $result2){
+				$scatter[$ind][0] = $result2->cnt;
+				$scatter[$ind][1] = $result2->test_score;
+				$num_count += $result2->cnt;
+				$ind++;
+				$sheet->setCellValue('P'.$ind, $result2->cnt);
+				$sheet->setCellValue('Q'.$ind, $result2->test_score);
+				
+			}
+			$median = 0;
+			$br = 0;
+			$median1 = 0;
+			$median2 = 0;
+
+			$flagMedian = 0;
+			$valueMedian = 0;
+			if($num_count % 2 == 0)
+			{
+				 $median1 = $num_count / 2;
+				 $median2 = $median1 + 1;
+			}
+			else{
+				$median = $num_count/2;
+				$median = round($median, 0);
+			}
+
+			for($i = 0; $i< count($scatter); $i++){
+					
+				$cnt_stud = $scatter[$i][0];
+				$cnt_point = $scatter[$i][1];
+				$br += $cnt_stud;
+					
+				if($num_count % 2 == 0){
+				
+					if($br >= $median1 && $br >= $median2 && $flagMedian == 0){
+						$valueMedian = $cnt_point;
+						$flagMedian = 1;
+					}
+					if($br >= $median1 && $br < $median2 && $flagMedian < 2){
+						$valueMedian = $cnt_point;
+						$flagMedian = 2;
+					}
+					if( $br >= $median2 && $flagMedian == 2){
+						$valueMedian += $cnt_point;
+						
+						$valueMedian = $valueMedian / 2;
+						$flagMedian = 3;
+					}
+				}
+					
+				 else
+				{
+					if($br >= $median && $flagMedian == 0){
+						$valueMedian = $cnt_point;
+						$flagMedian = 1;
+					}
+					
+				}
+
+			}
 			// Set the Labels for each data series we want to plot
 			//     Datatype
 			//     Cell reference for data
@@ -133,7 +224,7 @@ class ProcessFile implements ShouldQueue
 			//     Data values
 			//     Data Marker
 			$dataSeriesLabels1 = [
-				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'graphs!$A$1', null, 1), 
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'results!$F$1', null, 1), 
 			];
 			// Set the X-Axis Labels
 			//     Datatype
@@ -143,7 +234,7 @@ class ProcessFile implements ShouldQueue
 			//     Data values
 			//     Data Marker
 			$xAxisTickValues1 = [
-				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'graphs!$A$1:$A$5', null, 5), 
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'results!$F$1:$F$5', null, 5), 
 			];
 			// Set the Data values for each data series we want to plot
 			//     Datatype
@@ -153,7 +244,7 @@ class ProcessFile implements ShouldQueue
 			//     Data values
 			//     Data Marker
 			$dataSeriesValues1 = [
-				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'graphs!$B$1:$B$5', null, 5),
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'results!$G$1:$G$5', null, 5),
 			];
 
 			// Build the dataseries
@@ -176,7 +267,7 @@ class ProcessFile implements ShouldQueue
 			// Set the chart legend
 			$legend1 = new Legend(Legend::POSITION_RIGHT, null, false);
 
-			$title1 = new Title('Test Pie Chart');
+			$title1 = new Title('Оценки');
 
 			// Create the chart
 			$chart1 = new Chart(
@@ -195,11 +286,76 @@ class ProcessFile implements ShouldQueue
 			$chart1->setBottomRightPosition('O20');
 
 			// Add the chart to the worksheet
-			$sheet0->addChart($chart1);
+			$sheet->addChart($chart1);
 			//----------------------------------------------
+			$dataSeriesLabels = [
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'results!$Q$1:$Q$'.$ind, null, $ind), 
+			];
+			// Set the X-Axis Labels
+			//     Datatype
+			//     Cell reference for data
+			//     Format Code
+			//     Number of datapoints in series
+			//     Data values
+			//     Data Marker
+			$xAxisTickValues = [
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'results!$Q$1:$Q$'.$ind, null, $ind), // Q1 to Q4
+			];
+			// Set the Data values for each data series we want to plot
+			//     Datatype
+			//     Cell reference for data
+			//     Format Code
+			//     Number of datapoints in series
+			//     Data values
+			//     Data Marker
+			$dataSeriesValues = [
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'results!$P$1:$P$'.$ind, null, $ind),
+			];
+
+			// Build the dataseries
+			$series = new DataSeries(
+				DataSeries::TYPE_BARCHART, // plotType
+				DataSeries::GROUPING_STACKED, // plotGrouping
+				range(0, count($dataSeriesValues) - 1), // plotOrder
+				$dataSeriesLabels, // plotLabel
+				$xAxisTickValues, // plotCategory
+				$dataSeriesValues        // plotValues
+			);
+			// Set additional dataseries parameters
+			//     Make it a horizontal bar rather than a vertical column graph
+			//$series->setPlotDirection(DataSeries::DIRECTION_BAR);
+
+			// Set the series in the plot area
+			$plotArea = new PlotArea(null, [$series]);
+			// Set the chart legend
+			$legend = new Legend(Legend::POSITION_RIGHT, null, false);
+
+			$title = new Title('Тестови балове');
+			$xAxisLabel = new Title('Балове');
+			$yAxisLabel = new Title('Ученици');
+			// Create the chart
+			$chart = new Chart(
+				'chart2', // name
+				$title, // title
+				$legend, // legend
+				$plotArea, // plotArea
+				true, // plotVisibleOnly
+				0, // displayBlanksAs
+				$xAxisLabel, // xAxisLabel
+				$yAxisLabel  // yAxisLabel
+			);
+
+			// Set the position where the chart should appear in the worksheet
+			$chart->setTopLeftPosition('S1');
+			$chart->setBottomRightPosition('Z20');
+
+			// Add the chart to the worksheet
+			$sheet->addChart($chart);
+
 			
-			$test = Test::find($test_id);
-			$students = Student::where('test_id', $test_id)->get();
+			
+			//-----------------------------------------------
+			
 			
 			$sheet2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за теста');
 			$spreadsheet->addSheet($sheet2, 1);
@@ -214,7 +370,7 @@ class ProcessFile implements ShouldQueue
 			$sheet2->setCellValue('B3', $test->mean);
 			
 			$sheet2->setCellValue('A4', "Медиана");
-			$sheet2->setCellValue('B4', $test->median);
+			$sheet2->setCellValue('B4', $valueMedian);
 			
 			$sheet2->setCellValue('A5', "Минимален бал");
 			$sheet2->setCellValue('B5', $test->min_bal);
@@ -525,31 +681,9 @@ class ProcessFile implements ShouldQueue
 				$sheet5->setCellValue('I'.$it, $sentences);	
 				$it++;				
 			}	
-			
 		
 			
-			$sheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Резултати от теста');
-			$spreadsheet->addSheet($sheet, 5);
 			
-			$sheet->setCellValue('A1', 'Номер');
-			$sheet->setCellValue('B1', 'Име');
-			$sheet->setCellValue('C1', 'Брой точки');
-			$sheet->setCellValue('D1', 'Оценка');
-			$i = 2;
-			foreach($students as $student){
-				$student_id = $student->id;
-				$testStudent = TestStudent::where('student_id', $student_id)->first();
-				$student_name = $student->name;
-				$student_number = $student->class_number;
-				$test_score = $testStudent->test_score;
-				$mark = $testStudent->mark;
-				
-				$sheet->setCellValue('A'.$i, $student_number);
-				$sheet->setCellValue('B'.$i, $student_name);
-				$sheet->setCellValue('C'.$i, $test_score);
-				$sheet->setCellValue('D'.$i, $mark);
-				$i++;
-			}	
 			$ldate = date('Y-m-d');
 			
 			$writer = new Xlsx($spreadsheet);

@@ -14,8 +14,17 @@ use App\StudentItem;
 use App\Student;
 use App\Distractor;
 use App\TestStudent;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeries;
+use PhpOffice\PhpSpreadsheet\Chart\DataSeriesValues;
+use PhpOffice\PhpSpreadsheet\Chart\Layout;
+use PhpOffice\PhpSpreadsheet\Chart\Legend;
+use PhpOffice\PhpSpreadsheet\Chart\PlotArea;
+use PhpOffice\PhpSpreadsheet\Chart\Title;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+
 
 class ProcessFile implements ShouldQueue
 {
@@ -77,11 +86,124 @@ class ProcessFile implements ShouldQueue
 			calculate_disperse_j_rem($test_id);
 			calculate_kr20_j_rem($test_id);
 			
+			$spreadsheet = new Spreadsheet();
+			$sheet0 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'shee');
+			$spreadsheet->addSheet($sheet0, 0);
+			$sheet0 = $spreadsheet->getSheet(0);
+			$results = DB::table('test_student')
+                ->select('mark')
+				->where('test_id', $test_id)
+                ->get();
+				
+			$slab = 0; 
+			$sreden = 0; 
+			$dobyr = 0; 
+			$mn_dobyr = 0; 
+			$otlichen = 0; 
+		
+			foreach($results as $result){
+				if($result->mark < 3)
+					$slab++;
+				if($result->mark >= 3 && $result->mark < 3.50)
+					$sreden++;
+				if($result->mark >= 3.50 && $result->mark < 4.50)
+					$dobyr++;
+				if($result->mark >= 4.50 && $result->mark < 5.50)
+					$mn_dobyr++;
+				if($result->mark >= 5.50 && $result->mark <= 6)
+					$otlichen++; 
+			}
+			
+				$sheet0->fromArray(
+						[
+							['Слаб', $slab],
+							['Среден', $sreden],
+							['Добър', $dobyr],
+							['Мн. добър', $mn_dobyr],
+							['Отличен',  $otlichen],
+						]
+				);
+						//___________________________
+			
+			// Set the Labels for each data series we want to plot
+			//     Datatype
+			//     Cell reference for data
+			//     Format Code
+			//     Number of datapoints in series
+			//     Data values
+			//     Data Marker
+			$dataSeriesLabels1 = [
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'shee!$A$1', null, 1), 
+			];
+			// Set the X-Axis Labels
+			//     Datatype
+			//     Cell reference for data
+			//     Format Code
+			//     Number of datapoints in series
+			//     Data values
+			//     Data Marker
+			$xAxisTickValues1 = [
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_STRING, 'shee!$A$1:$A$5', null, 5), 
+			];
+			// Set the Data values for each data series we want to plot
+			//     Datatype
+			//     Cell reference for data
+			//     Format Code
+			//     Number of datapoints in series
+			//     Data values
+			//     Data Marker
+			$dataSeriesValues1 = [
+				new DataSeriesValues(DataSeriesValues::DATASERIES_TYPE_NUMBER, 'shee!$B$1:$B$5', null, 5),
+			];
+
+			// Build the dataseries
+			$series1 = new DataSeries(
+				DataSeries::TYPE_PIECHART, // plotType
+				null, // plotGrouping (Pie charts don't have any grouping)
+				range(0, count($dataSeriesValues1) - 1), // plotOrder
+				$dataSeriesLabels1, // plotLabel
+				$xAxisTickValues1, // plotCategory
+				$dataSeriesValues1          // plotValues
+			);
+
+			// Set up a layout object for the Pie chart
+			$layout1 = new Layout();
+			$layout1->setShowVal(true);
+			$layout1->setShowPercent(true);
+
+			// Set the series in the plot area
+			$plotArea1 = new PlotArea($layout1, [$series1]);
+			// Set the chart legend
+			$legend1 = new Legend(Legend::POSITION_RIGHT, null, false);
+
+			$title1 = new Title('Test Pie Chart');
+
+			// Create the chart
+			$chart1 = new Chart(
+				'chart1', // name
+				$title1, // title
+				$legend1, // legend
+				$plotArea1, // plotArea
+				true, // plotVisibleOnly
+				0, // displayBlanksAs
+				null, // xAxisLabel
+				null   // yAxisLabel - Pie charts don't have a Y-Axis
+			);
+
+			// Set the position where the chart should appear in the worksheet
+			$chart1->setTopLeftPosition('I1');
+			$chart1->setBottomRightPosition('O20');
+
+			// Add the chart to the worksheet
+			$sheet0->addChart($chart1);
+			//----------------------------------------------
 			$test = Test::find($test_id);
 			$students = Student::where('test_id', $test_id)->get();
 		
-			$spreadsheet = new Spreadsheet();
-			$sheet = $spreadsheet->getActiveSheet();
+			
+			$sheet = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Графики');
+			$spreadsheet->addSheet($sheet, 5);
+			
 			$sheet->setTitle("Резултати от теста");
 			$sheet->setCellValue('A1', 'Номер');
 			$sheet->setCellValue('B1', 'Име');
@@ -102,6 +224,7 @@ class ProcessFile implements ShouldQueue
 				$sheet->setCellValue('D'.$i, $mark);
 				$i++;
 			}	
+			
 			
 			$sheet2 = new \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet($spreadsheet, 'Статистика за теста');
 			$spreadsheet->addSheet($sheet2, 1);
@@ -387,7 +510,7 @@ class ProcessFile implements ShouldQueue
 						$sheet5->setCellValue('B'.$it, 'Задачата е трудна.');
 					else if($item2->difficulty >=0.41 && $item2->difficulty <= 0.7)
 						$sheet5->setCellValue('B'.$it, 'Задачата е оптимална.');
-					else if($item2->difficulty >=0.71 && $item2->difficulty <= 0.85)
+					else if($item2->difficulty >=0.71 && $item2->difficulty < 0.86)
 						$sheet5->setCellValue('B'.$it, 'Задачата е лесна.');
 					else if($item2->difficulty >=0.86 && $item2->difficulty <= 1)
 						$sheet5->setCellValue('B'.$it, 'Задачата е много лесна.');
@@ -433,11 +556,12 @@ class ProcessFile implements ShouldQueue
 			$writer = new Xlsx($spreadsheet);
 			$t = time();
 			$filename = "test_analysis".$t.".xlsx";
+			$writer->setIncludeCharts(true);
 			$writer->save('results/'.$filename);
-			DB::table('result_file')
-				->insert(['test_id' => $test_id, 'user_id'=>$userId,'file_name' =>$filename,
-				'result_date'=>$ldate]);	
-			$test->result_processed = 1;
+			//DB::table('result_file')
+			//	->insert(['test_id' => $test_id, 'user_id'=>$userId,'file_name' =>$filename,
+			//	'result_date'=>$ldate]);	
+			//$test->result_processed = 1;
 			$test->save();	
 		}
     }

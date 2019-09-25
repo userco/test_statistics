@@ -34,6 +34,9 @@ class SearchController extends Controller
 				$links .= "<a href='results/".$result->file_name."' target='_blank'>".$result->file_name."</a><br>";
 			}
 		}	
+		if(!$links){
+			$links = "Няма намерени резултати.";
+		}	
 		return View::make('search/search')->with(array('links'=> $links));
 	}	
 		

@@ -3,6 +3,16 @@
 @section('content')
 <div class="container">
     <h1> Импорт на файл</h2>
+		@isset($notice)
+			<div class="alert alert-danger">
+				{!!$notice!!}
+			</div>	
+		@endisset
+		@isset($notice2)
+			<div class="alert alert-success">
+				{!!$notice2!!}
+			</div>	
+		@endisset
 		@if ($errors->any())
 			  <div class="alert alert-danger">
 				<ul>

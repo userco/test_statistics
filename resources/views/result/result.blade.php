@@ -3,6 +3,17 @@
 @section('content')
 <div class="container">
     <h2> Генериране на файл с анализ на теста</h2>
+		
+		@isset($notice)
+			<div class="alert alert-danger">
+				{!!$notice!!}
+			</div>	
+		@endisset
+	    @isset($notice2)
+			<div class="alert alert-success">
+				{!!$notice2!!}
+			</div>	
+		@endisset
 		@if ($errors->any())
 			  <div class="alert alert-danger">
 				<ul>

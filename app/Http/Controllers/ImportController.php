@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Jobs\ImportFIle;
+use DB;
 
 class ImportController extends Controller
 {
@@ -30,7 +31,18 @@ class ImportController extends Controller
 	
     public function store(Request $request){
 		
-		 $file = $request->file('file');
+		$user = \Auth::user();
+		$userId = $user->id;
+		$result= DB::table('test')
+						 ->select(DB::raw('id'))
+						 ->where('user_id', '=', $userId)
+						 ->where('result_processed', '=', null)
+						 ->first();
+		if($result){
+			$notice = "Вече има импортнати данни за обработване.";
+			return View::make('import/import')->with(array('notice'=> $notice));
+		}	
+		$file = $request->file('file');
    
       /*/Display File Name
       echo 'File Name: '.$file->getClientOriginalName();
@@ -64,7 +76,8 @@ class ImportController extends Controller
 		$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 		//var_dump($sheetData);
 		ImportFIle::dispatch($sheetData);
-		return View::make('import/import');
+		$notice2 = "Успешно са импортнати данни за обработване.";
+		return View::make('import/import')->with(array('notice2'=> $notice2));;
 	}
 	
 	

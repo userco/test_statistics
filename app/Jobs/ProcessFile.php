@@ -691,10 +691,10 @@ class ProcessFile implements ShouldQueue
 			$filename = "test_analysis".$t.".xlsx";
 			$writer->setIncludeCharts(true);
 			$writer->save('results/'.$filename);
-			//DB::table('result_file')
-			//	->insert(['test_id' => $test_id, 'user_id'=>$userId,'file_name' =>$filename,
-			//	'result_date'=>$ldate]);	
-			//$test->result_processed = 1;
+			DB::table('result_file')
+				->insert(['test_id' => $test_id, 'user_id'=>$userId,'file_name' =>$filename,
+				'result_date'=>$ldate]);	
+			$test->result_processed = 1;
 			$test->save();	
 		}
     }

@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Jobs\ProcessFile;
+use DB;
 
 class ResultController extends Controller
 {
@@ -29,9 +30,20 @@ class ResultController extends Controller
 	}
 	
     public function store(Request $request){
-		
+		$user = \Auth::user();
+		$userId = $user->id;
+		$result= DB::table('test')
+						 ->select(DB::raw('id'))
+						 ->where('user_id', '=', $userId)
+						 ->where('result_processed', '=', null)
+						 ->first();
+		if(!$result){
+			$notice = "Няма импортнати данни за обработване.";
+			return View::make('result/result')->with(array('notice'=> $notice));
+		}	
 		ProcessFile::dispatch();
-		return View::make('result/result');
+		$notice2 = "Успешно е генериран файл.";
+		return View::make('result/result')->with(array('notice2' => $notice2));
 	}
 	
 	

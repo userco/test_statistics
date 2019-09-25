@@ -35,7 +35,9 @@ class SearchController extends Controller
 			}
 		}	
 		if(!$links){
-			$links = "Няма намерени резултати.";
+			$links = "<div class='alert alert-warning'>
+						Няма намерени резултати.
+					</div>";
 		}	
 		return View::make('search/search')->with(array('links'=> $links));
 	}	

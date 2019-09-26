@@ -75,6 +75,7 @@ class ImportController extends Controller
 		$spreadsheet = IOFactory::load($inputFileName);
 		$sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 		//var_dump($sheetData);
+		//
 		ImportFIle::dispatch($sheetData);
 		$notice2 = "Успешно са импортнати данни за обработване.";
 		return View::make('import/import')->with(array('notice2'=> $notice2));;

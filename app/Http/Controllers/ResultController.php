@@ -41,6 +41,7 @@ class ResultController extends Controller
 			$notice = "Няма импортнати данни за обработване.";
 			return View::make('result/result')->with(array('notice'=> $notice));
 		}	
+		
 		ProcessFile::dispatch();
 		$notice2 = "Успешно е генериран файл.";
 		return View::make('result/result')->with(array('notice2' => $notice2));

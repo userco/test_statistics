@@ -37,7 +37,8 @@ class ProcessFile implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        set_time_limit(8000000);
+		ini_set("memory_limit", "10056M");
     }
 
     /**

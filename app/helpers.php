@@ -724,8 +724,8 @@ if (! function_exists('calculate_mean_correct_incorrect')) {
 				}	
 			}
 			
-			$mean_correct = $sumRight / $cntRight;
-			$mean_incorrect = $sumWrong / $cntWrong;
+			$mean_correct = ($cntRight)?$sumRight / $cntRight: 0;
+			$mean_incorrect = ($cntWrong)?$sumWrong / $cntWrong: 0;
 			
 			DB::table('item')
 				->where('id', $id)

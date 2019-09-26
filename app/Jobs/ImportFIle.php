@@ -26,6 +26,8 @@ class ImportFIle implements ShouldQueue
     public function __construct($array)
     {
         $this->fileContents = $array;
+		set_time_limit(8000000);
+		ini_set("memory_limit", "10056M");
     }
 
     /**
@@ -42,11 +44,24 @@ class ImportFIle implements ShouldQueue
 		$test = new Test;
 		$test->user_id = $userId;
 		$test->save();
+		$p = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L','M', 'N','O', 'P', 'Q', 'R', 
+		'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 
+		'AL','AM', 'AN','AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ'];
         foreach($this->fileContents as $row){
 			$j = 0;
 			$student_id = null;
 			foreach($row as $cell){
-				if($i==0 && $j > 2 && $cell){
+				if($i==0 && $j >= 2 && $cell){
+					if(is_string($cell) && strlen($cell) > 1){
+						$k = $i + 1;
+						
+						echo "Некоректен вход - клетка ".$k." ".$p[$j];
+						exit(1);
+					}
+					if(is_array($cell)){
+						echo "Некоректен вход - клетка ".$k." ".$p[$j];
+						exit(1);
+					}	
 					//insert item key
 					$item = new Item;
 					$item->test_id = $test->id;
@@ -54,7 +69,24 @@ class ImportFIle implements ShouldQueue
 					$item->right_answer = $cell;
 					$item->save();
 				}
-				else if($i==1 && $j == 3 && $cell){
+				else if($i==1 && $j == 2 && $cell){
+					if(!$cell){
+						echo "Не е попълнен броят на дистракторите във файла-шаблон.";
+						exit(1);
+					}
+					if($cell){
+					if($cell > 5){
+					
+						echo "Броят на дистракторите във файла-шаблон трябва да е до 5 включително.";
+						exit(1);
+					}
+					if($cell < 2){
+					
+						echo "Броят на дистракторите във файла-шаблон трябва да е най-малко 2.";
+						exit(1);
+					}
+					}
+								
 					//insert count distractors
 					$test->count_distractors = $cell;
 					$test->save();
@@ -79,13 +111,22 @@ class ImportFIle implements ShouldQueue
 					$student->save();
 					
 				}
-				else if($i>=3 && $j == 2 && $cell){
+				else if($i>=3 && $j == 1 && $cell){
 					//insert student
 					$student->name = $cell;
 					$student->save();
 					$student_id = $student->id;
 				}
-				else if($i>=3 && $j > 2 && $cell){
+				else if($i>=3 && $j > 1 && $cell){
+					$k = $i + 1;
+					if(is_string($cell) && strlen($cell) > 1){
+						echo "Некоректен вход - клетка ".$k ." ".$p[$j];
+						exit(1);
+					}
+					if(is_array($cell)){
+						echo "Некоректен вход - клетка ".$k ." ".$p[$j];
+						exit(1);
+					}	
 					//insert student item
 					$studentItem = new StudentItem;
 					$k = $j - 2;

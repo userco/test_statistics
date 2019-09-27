@@ -84,10 +84,10 @@ if (! function_exists('calculate_mean_j_removed')) {
     function calculate_mean_j_removed($test_id)
     {	
 		$res =DB::table('test')
-				->select('items_count')
+				->select('students_count')
 				->where('id', $test_id)
 				->first();
-		$items_count = $res->items_count;		
+		$students_count = $res->students_count;		
 		$students = Student::where('test_id', $test_id)->get();
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
@@ -102,11 +102,10 @@ if (! function_exists('calculate_mean_j_removed')) {
 					}
 				}		
 			}
-	
-			$mean_j_rem = $sum/($items_count -1);
+			$mean_j_rem = $sum/$students_count;
 			DB::table('item')
 				->where('id', $item_id)
-				->update(['mean_rem' => $mean_j_rem]);
+				->update(['mean_rem' => $mean_j_rem]);	
 		}		
         return true;
     }
@@ -114,11 +113,11 @@ if (! function_exists('calculate_mean_j_removed')) {
 if (! function_exists('calculate_disperse_j_rem')) {
     function calculate_disperse_j_rem($test_id)
     {	
-		$res = DB::table('test')
-				->select('items_count')
+		$res =DB::table('test')
+				->select('students_count')
 				->where('id', $test_id)
 				->first();
-		$items_count = $res->items_count;	
+		$students_count = $res->students_count;	
 		$items = Item::where('test_id', $test_id)->get();
 		foreach($items as $item){
 			$item_id = $item->id;
@@ -128,9 +127,9 @@ if (! function_exists('calculate_disperse_j_rem')) {
 			
 			foreach($testStudents as $testStudent){
 				$test_score = $testStudent->test_score;
-				$sum = ($test_score - $mean_j_rem)*($test_score - $mean_j_rem);
+				$sum += ($test_score - $mean_j_rem)*($test_score - $mean_j_rem);
 			}	
-			$disperse_j_rem = $sum/($items_count -1);
+			$disperse_j_rem = $sum/$students_count;
 			DB::table('item')
 				->where('id', $item_id)
 				->update(['disperse_rem' => $disperse_j_rem]);

@@ -433,7 +433,8 @@ class ProcessFile implements ShouldQueue
 		
 			foreach($items as $item){
 				$item_id = $item->id;
-				$sheet3->setCellValue('A'.$k, "Задача ". $item->number);
+				$item_number = $item->number + 1;
+				$sheet3->setCellValue('A'.$k, "Задача ". $item_number);
 				$sheet3->setCellValue('B'.$k, $item->difficulty);
 				$sheet3->setCellValue('C'.$k, $item->discrimination);
 				$sheet3->setCellValue('D'.$k, $item->rpbis);
@@ -610,7 +611,8 @@ class ProcessFile implements ShouldQueue
 			$items2 = Item::where('test_id', $test_id)->get();
 			$it = 2;
 			foreach($items2 as $item2){
-				$sheet5->setCellValue('A'.$it, 'Задача '.$item2->number);
+				$item2_number = $item2->number + 1;
+				$sheet5->setCellValue('A'.$it, 'Задача '.$item2_number);
 				if($test->count_distractors == 2){
 					if($item2->difficulty >=0 && $item2->difficulty <= 0.5)
 						$sheet5->setCellValue('B'.$it, 'Задачата е много трудна(недопустимо).');
